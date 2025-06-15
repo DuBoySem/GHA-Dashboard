@@ -5,7 +5,6 @@ from dataclasses import asdict, dataclass
 from statistics import stdev
 from typing import DefaultDict, dataclass_transform
 
-# TODO make changes to paths and filenames & make it changeable easily (env file for example)
 # setup the base folder path
 root_path = os.path.dirname(os.path.abspath(__file__))
 # paths to the files

@@ -40,8 +40,7 @@ async def check_csv(request: Request):
                 # checks if new lines got added
                 if curr_line_number > last_check_line_number:
                     print(
-                        f"[csv_checker] {curr_line_number -
-                                         last_check_line_number} new lines found"
+                        f"[csv_checker] {curr_line_number - last_check_line_number} new lines found"
                     )
                     last_check_line_number = curr_line_number
                     try:

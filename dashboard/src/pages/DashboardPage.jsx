@@ -25,8 +25,13 @@ const DashboardPage = () => {
         if (repo.trim()) {
             try {
                 //---- new code-----
+                // Close existing EventSource if it exists
+                if (eventSource) {
+                  eventSource.close();
+                }
                 // code to start the SSE (event stream)
                 const source = new EventSource("http://localhost:8000/api/csv_checker");
+                // setEventSource(source)
                 source.onmessage= (event) => {
                   console.log("new stream event");
                   try{
@@ -91,6 +96,12 @@ const DashboardPage = () => {
         const handleBeforeUnload = (e) => {
             e.preventDefault();
             e.returnValue = '';
+            //---new code---
+            // to prevent duplicate requests
+            if (eventSource) {
+              eventSource.close();
+            }
+            //-----------
         };
 
         launch();
@@ -98,11 +109,23 @@ const DashboardPage = () => {
         
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
+          //---new code------
+          //to prevent duplicate requests
+          if (eventSource) {
+            eventSource.close();
+          }
+          //-----------
         };
     }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        //---new code------
+        //to prevent duplicate requests
+        if (eventSource) {
+          eventSource.close();
+        }
+        //-----------
         await fetchKpis(repoUrl)
     };
 

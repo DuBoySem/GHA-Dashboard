@@ -109,47 +109,50 @@ def compute_kpis(raw_dict):
         # for workflows
         # get the workflow name
         workflow = row.get("workflow_name")
-        # get workflow conclusion
-        conclusion = row.get("conclusion")
-        # get build duration
-        duration = float(row.get("build_duration", 0))
         # increments total number of execution of specific workflow
         grouped_workflows[workflow]["total"] += 1
-        # append build duration
-        grouped_workflows[workflow]["durations"].append(duration)
-        # test section
-        # checks if tests got ran this execution
-        if row["tests_ran"] == "True":
-            # increment number of times the tests got ran in workflow execution
-            grouped_workflows[workflow]["total_times_tests_ran"] += 1
-            # prevent edge case of dividing by 0
-            if (int(row["tests_total"]) - int(row["tests_skipped"])) > 0:
-                grouped_workflows[workflow]["total_times_tests_ran_passed"] += 1
-                # passed tests rate
-                pass_rate = (row["tests_passed"]) / (
-                    row["tests_total"] - row["tests_skipped"]
-                )
-                grouped_workflows[workflow]["sum_tests_passed_rate"] += pass_rate
-            # prevent edge case of dividing by 0
-        # test churn
-        grouped_workflows[workflow]["sum_test_change"] += int(row["gh_test_churn"])
+        # skips the first 10 execution of a workflow
+        if grouped_workflows[workflow]["total"]>10:
+            #-------------------
+            # get workflow conclusion
+            conclusion = row.get("conclusion")
+            # get build duration
+            duration = float(row.get("build_duration", 0))
+            # append build duration
+            grouped_workflows[workflow]["durations"].append(duration)
+            # test section
+            # checks if tests got ran this execution
+            if row["tests_ran"] == "True":
+                # increment number of times the tests got ran in workflow execution
+                grouped_workflows[workflow]["total_times_tests_ran"] += 1
+                # prevent edge case of dividing by 0
+                if (int(row["tests_total"]) - int(row["tests_skipped"])) > 0:
+                    grouped_workflows[workflow]["total_times_tests_ran_passed"] += 1
+                    # passed tests rate
+                    pass_rate = (row["tests_passed"]) / (
+                        row["tests_total"] - row["tests_skipped"]
+                    )
+                    grouped_workflows[workflow]["sum_tests_passed_rate"] += pass_rate
+                # prevent edge case of dividing by 0
+            # test churn
+            grouped_workflows[workflow]["sum_test_change"] += int(row["gh_test_churn"])
 
-        # for issuers
-        # get issuer name
-        issuer_name = row.get("issuer_name")
+            # for issuers
+            # get issuer name
+            issuer_name = row.get("issuer_name")
 
-        # increment number of build executed by issuer
-        grouped_issuers[issuer_name]["total"] += 1
+            # increment number of build executed by issuer
+            grouped_issuers[issuer_name]["total"] += 1
 
-        # checks if excution was a failure to increment it
-        if conclusion == "failure":
-            # increment number of failed times for the workflow
-            grouped_workflows[workflow]["fail"] += 1
-            # adds duration of the failed execution
-            grouped_workflows[workflow]["sum_fail_time"] += duration
-            # increment number of failed times for the issuer
-            grouped_issuers[issuer_name]["fail"] += 1
-
+            # checks if excution was a failure to increment it
+            if conclusion == "failure":
+                # increment number of failed times for the workflow
+                grouped_workflows[workflow]["fail"] += 1
+                # adds duration of the failed execution
+                grouped_workflows[workflow]["sum_fail_time"] += duration
+                # increment number of failed times for the issuer
+                grouped_issuers[issuer_name]["fail"] += 1
+            #---------------
     wf_fail_rate = []
     issuer_fail_rate = []
     wf_stddev = []
@@ -158,6 +161,9 @@ def compute_kpis(raw_dict):
     wf_test_churn = []
 
     for wf_name, stats in grouped_workflows.items():
+        # removes 10 first executions from total to have accurate values and metrics
+        if stats["total"] > 10:
+            stats["total"]-=10;
         # create line of data for failure rate per wf
         fail_rate = round(stats["fail"] / stats["total"], 2)
         wf_fail_rate.append(AverageFaillureRatePerWorkflow(workflow_name=wf_name, faillure_rate=fail_rate))

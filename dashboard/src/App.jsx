@@ -1,19 +1,12 @@
-import { computeKpisFromCSV } from './utils/computeKpis.js'
-import { useState } from "react";
 import DashboardPage from "./pages/DashboardPage.jsx";
-import Papa from "papaparse";
+import HomePage from "./pages/HomePage.jsx";
+import {useStore} from "./store/useStore.js";
 
 const App = () => {
-    const [kpis, setKpis] = useState({})
+    const token = useStore((state) => state.token);
+    const repoUrl = useStore((state) => state.repoUrl);
 
-
-    const handleResetApp = () => {
-        setKpis({})
-    }
-
-    return (
-        <DashboardPage kpis={kpis} onReset={handleResetApp} />
-    )
+    return token && repoUrl ? <DashboardPage />: <HomePage/>
 }
 
 export default App;

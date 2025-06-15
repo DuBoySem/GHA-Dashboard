@@ -72,8 +72,8 @@ class AverageExecutionFailsByTeamSize:
 # write final KPIs in json file
 def write_json(kpis_path, kpis_dict):
     # write the KPIs in a single json file
-    print(f"[transform_kpis] writing path: {kpis_path}")
-    print(f"[transform_kpis]kpis data: {kpis_dict}")
+    # print(f"[transform_kpis] writing path: {kpis_path}")
+    # print(f"[transform_kpis]kpis data: {kpis_dict}")
     with open(kpis_path, mode="w", encoding="utf8-") as kpis:
         json.dump(kpis_dict, kpis, indent=4)
 

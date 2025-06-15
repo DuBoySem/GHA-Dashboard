@@ -1,18 +1,30 @@
 # GHA Dashboard
 
-This part of the project is a React application based on Vite that allows you to upload a CSV file containing GitHub Actions data, automatically compute KPIs, and visualize them as interactive charts using Recharts and Tailwind CSS.
+This is a React + Vite application that lets you authenticate with a GitHub token and visualize GitHub Actions KPIs for a specific repository. The dashboard is generated dynamically using the GitHub API and displayed using interactive charts with Recharts and Tailwind CSS.
+
+---
+
+## Authentication & Repository Input
+
+To get started, the user must:
+
+1. Enter a valid GitHub personal access token (`github_pat_...` format)
+2. Enter the full GitHub repository URL (e.g., `https://github.com/user/repo`)
+
+If the token is valid and the repository exists, the dashboard will be displayed.
 
 ---
 
 ## Main Features
 
-* Upload CSV file (drag & drop or manual selection)
-* Automatic GitHub Actions KPI calculations:
-
-  * Workflow failure rate (pie chart)
-  * Standard deviation of workflow durations (horizontal bars)
-  * Failure rate by issuer (table)
-* Clean and responsive display with TailwindCSS + Recharts
+* GitHub token validation via `GET https://api.github.com/user`
+* Repository validation and KPI computation via GitHub API
+* Interactive KPI visualizations:
+  * Workflow failure rate (pie chart) : number of failures per workflow
+  * Workflow duration statistics (bar chart) : standard deviation of workflow durations
+  * Failure rate by contributor (table or chart) : failure rate by issuer
+* Clean and responsive UI using Tailwind CSS
+* In-memory/session-based token storage (not persisted across browser sessions)
 
 ---
 
@@ -34,7 +46,7 @@ npm install
 3. Start the development server:
 
 ```bash
-npm run dev
+npm run frontend
 ```
 
 4. Open the app in your browser:
@@ -45,31 +57,11 @@ http://localhost:5173
 
 ---
 
-## Expected CSV Format
+## Disclaimer
 
-The CSV file must contain at least the following columns:
-
-* `workflow_name`
-* `build_duration`
-* `conclusion`
-* `issuer_name`
-* `job_details` (JSON format containing `job_name`, `job_duration`, `job_result`)
-
----
-
-## KPI Computation
-
-Data is processed in `utils/computeKpis.js`:
-
-* Rounded to 2 decimal places
-* Outliers removed using Z-score filtering
-* Calculated KPIs:
-
-  * `workflowFailures`: number of failures per workflow
-  * `workflowStddev`: standard deviation of workflow durations
-  * `issuerFailures`: failure rate by issuer
-
----
+* GitHub tokens are stored only temporarily in sessionStorage, and are encrypted in-memory.
+* Never share your token or commit it to version control.
+* This tool is intended for local visualization and debugging only.
 
 ## Technologies
 
@@ -77,4 +69,6 @@ Data is processed in `utils/computeKpis.js`:
 * [Vite](https://vitejs.dev/)
 * [Tailwind CSS](https://tailwindcss.com/)
 * [Recharts](https://recharts.org/)
-* [Papa Parse](https://www.papaparse.com/) for CSV parsing
+* [Zustand](https://github.com/pmndrs/zustand)
+* [CryptoJS](https://github.com/brix/crypto-js)
+* GitHub REST API 

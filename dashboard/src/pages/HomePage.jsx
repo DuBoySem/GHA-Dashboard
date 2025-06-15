@@ -1,102 +1,125 @@
-import {useState} from "react";
-import FilePreviewCard from "../components/FilePreviewCard.jsx";
-import { X } from "lucide-react";
+import {useState} from 'react';
+import {useStore} from '../store/useStore.js';
 
-const HomePage = ({onProcessCsv}) => {
-    const [dragOver, setDragOver] = useState(false)
-    const [file, setFile] = useState(null)
-    const [errorMessage, setErrorMessage] = useState(null)
-    const [isLoading, setIsLoading] = useState(false)
+function HomePage() {
+    const saveToken = useStore((state) => state.setToken);
+    const saveRepoUrl = useStore((state) => state.setRepoUrl);
+    const [token, setToken] = useState('');
+    const [repoUrl, setRepoUrl] = useState('');
+    const [errors, setErrors] = useState({});
+    const isDisabled = !token.trim() || !repoUrl.trim();
 
-    const processFile = (file) => {
-        setErrorMessage(null)
-        
-        if (file && file.type === 'text/csv' && file.name.endsWith('.csv')) {
-            setFile(file)
+    const handleTokenChange = (e) => {
+        setToken(e.target.value);
 
-            return
+        if (errors.token) {
+            setErrors((prev) => ({...prev, token: undefined}));
         }
+    };
 
-        setErrorMessage("Veuillez sélectionner un fichier CSV valide.")
-        setFile(null)
-    }
+    const handleRepoChange = (e) => {
+        setRepoUrl(e.target.value);
 
-    const handleSubmit = async () => {
-        setErrorMessage(null)
-        setIsLoading(true)
-        
+        if (errors.repo) {
+            setErrors((prev) => ({...prev, repo: undefined}));
+        }
+    };
+
+    const checkGithubToken = async () => {
         try {
-            await onProcessCsv(file)
+            const res = await fetch('https://api.github.com/user', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/vnd.github+json',
+                },
+            });
+
+            return res.ok;
         } catch (error) {
-            setErrorMessage(error.message)
-            setFile(null)
-        } finally {
-            setIsLoading(false)
+            return false;
         }
-    }
+    };
 
-    const handleRemove = () => {
-        setFile(null)
-        setErrorMessage(null)
-        setIsLoading(false)
-    }
+    const validGithubRepo = () => {
+        const newErrors = {};
+        const repoRegex = /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+$/;
 
-    const handleDrop = (e) => {
-        e.preventDefault()
-        setDragOver(false)
-        const file = e.dataTransfer.files[0]
-        processFile(file)
-    }
+        if (!repoRegex.test(repoUrl.trim())) {
+            newErrors.repo = 'Invalid URL format (expected: https://github.com/user/repo)';
+        }
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0]
-        processFile(file)
-    }
+        setErrors(newErrors);
+
+        return Object.keys(newErrors).length === 0;
+    };
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!validGithubRepo()) {
+            return;
+        }
+
+        const isTokenValid = await checkGithubToken();
+
+        if (!isTokenValid) {
+            setErrors((prev) => ({...prev, token: 'Invalid or unauthorized token'}));
+
+            return;
+        }
+        
+        saveToken(token);
+        saveRepoUrl(repoUrl);
+    };
 
     return (
-        <div className="w-full min-h-screen flex flex-col items-center bg-white justify-cente px-4 pt-20 gap-5">
-            <div className={"flex flex-col items-center justify-center gap-3"}>
-                <h1 className={"text-blue-600 text-5xl font-bold"}>Home page</h1>
-                <p className={"text-gray-500"}>Welcome to home page</p>
-            </div>
-            <div className="w-full max-w-3xl">
-                {errorMessage && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                        <strong className="font-bold">Erreur !</strong>
-                        <span className="block sm:inline"> {errorMessage}</span>
-                        <span className="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer flex items-center justify-center" onClick={() => setErrorMessage(null)}>
-                            <X className="w-5 h-5 text-red-500 hover:text-blue-600" />
-                        </span>
-                    </div>
-                )}
-                
-                {!file ? (
-                    <div
-                        onDrop={handleDrop}
-                        onDragOver={(e) => {
-                            e.preventDefault()
-                            setDragOver(true)
-                        }}
-                        onDragLeave={() => setDragOver(false)}
-                        className={`h-72 border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center
-                         text-center transition-colors ${dragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}`}
+        <div className={"min-h-screen bg-white py-20"}>
+            <div className="flex flex-col mx-auto p-4">
+                <div className={" flex flex-col items-center mb-8 gap-2"}>
+                    <h1 className={"text-3xl font-semibold text-blue-600"}>Welcome to GHAminer Dashboard</h1>
+                    <p className={"max-w-md text-center text-black leading-6"}>To get started, enter your GitHub token
+                        and the repository URL for which you want to view the dashboard.</p>
+                </div>
+                <form onSubmit={handleSubmit} className="w-1/3 mx-auto px-20 py-10 border border-blue-200 rounded-2xl">
+
+                    <label className="block mb-4 mt-4">
+                        GitHub Repository :
+                        <input
+                            type="text"
+                            placeholder="https://github.com/user/repo"
+                            value={repoUrl}
+                            onChange={handleRepoChange}
+                            className="w-full border rounded p-2 mt-1"
+                        />
+                        {errors.repo && <p className="text-red-500">{errors.repo}</p>}
+                    </label>
+                    <label className="block mb-2">
+                        GitHub Token :
+                        <input
+                            type="password"
+                            placeholder="github_pat_…"
+                            value={token}
+                            onChange={handleTokenChange}
+                            className="w-full border rounded p-2 mt-1"
+                        />
+                        {errors.token && <p className="text-red-500">{errors.token}</p>}
+                    </label>
+
+                    <button
+                        type="submit"
+                        disabled={isDisabled}
+                        className={`px-4 py-2 rounded w-full mt-5 ${
+                            isDisabled ? 'bg-gray-200 cursor-not-allowed text-gray-400' : 'bg-blue-600 text-white cursor-pointer hover:bg-blue-700'
+                        }`}
                     >
-                        <p className="text-gray-600 text-lg mb-2">Glissez un fichier CSV ici</p>
-                        <p className="text-sm text-gray-500 mb-4">ou cliquez pour en sélectionner un</p>
-                        <label htmlFor="file-upload"
-                               className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                            Choisir un fichier
-                        </label>
-                        <input id="file-upload" type="file" accept=".csv" onChange={handleFileChange}
-                               className="hidden"/>
-                    </div>
-                ) : (
-                    <FilePreviewCard file={file} onRemove={handleRemove} onSubmit={handleSubmit} isLoading={isLoading}/>
-                )}
+                        Generate Dashboard
+                    </button>
+                </form>
             </div>
         </div>
 
-    )
+    );
 }
 
-export default HomePage
+export default HomePage;

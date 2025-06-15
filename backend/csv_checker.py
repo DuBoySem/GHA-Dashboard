@@ -32,7 +32,6 @@ def get_line_number():
 
 async def check_csv(request: Request):
     last_check_line_number = 0
-    print(f"[csv_checker] kpis path write: {json_path_write}")
     while not await request.is_disconnected():
         try:
             if os.path.exists(csv_path_read):

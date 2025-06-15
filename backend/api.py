@@ -14,7 +14,7 @@ async def refresh(request: Request):
     Triggers a refresh by running GHAminer for the given repo URL and GitHub token.
     """
     data = await request.json()
-    print("DEBUG POST BODY:", data)  # <--- Add this line
+    # print("DEBUG POST BODY:", data)
     repo_url = data.get("repo_url")
     token = data.get("token")
 

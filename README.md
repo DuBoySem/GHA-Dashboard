@@ -21,7 +21,6 @@ This project builds an automated dashboard that monitors GitHub Actions workflow
 
 - Having Python 3.13.2 in your machine
 ### 1. Install Dependencies
-### 1. Install Dependencies
 
 ```bash
 pipenv install

@@ -11,21 +11,52 @@ const DashboardPage = () => {
     const repoFromStore = useStore((state) => state.repoUrl)
     const saveNewRepoUrl = useStore((state) => state.setRepoUrl)
     const [repoUrl, setRepoUrl] = useState("");
+    // ---- new code----
+    // to store streamed KPis and SSE elements
+    // var that contains the updated data from backend (streamedKPIs)
+    const [streamedKpis, setStreamedKpis] = useState(null)
+    const [eventSource, setEventSource] = useState(null)
+    // -----------------
+
     const [kpis, setKpis] = useState({});
     const [selectedWorkflows, setSelectedWorkflows] = useState([]);
 
     const fetchKpis = async (repo) => {
         if (repo.trim()) {
             try {
-                // const response = await fetch("http://localhost:8000/api/refresh", {
-                //     method: "POST",
-                //     headers: {
-                    //         "Content-Type": "application/json",
-                    //     },
-                    //     body: JSON.stringify({repo_url: repo, token: token}),
-                    // });
-                    
-                    // const result = await response.json();
+                //---- new code-----
+                // Close existing EventSource if it exists
+                if (eventSource) {
+                  eventSource.close();
+                }
+                // code to start the SSE (event stream)
+                const source = new EventSource("http://localhost:8000/api/csv_checker");
+                // setEventSource(source)
+                source.onmessage= (event) => {
+                  console.log("new stream event");
+                  try{
+                    const parsedData = JSON.parse(event.data);
+                    //setting new received data
+                    setStreamedKpis(parsedData);
+                    console.log("new kpis streamed: ", parsedData);
+                  } 
+                  catch (e) {
+                    console.log("error parsing streamed kpis: ",e);
+                  }
+                };
+                source.onerror = (e) =>{
+                  console.error("Error SSE: ",e);
+                  source.close();
+                };
+                await new Promise((resolve) => setTimeout(resolve, 5000));
+                //---------------------
+                const response = await fetch("http://localhost:8000/api/refresh", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ repo_url: repoFromStore, token: token }),
+                });
                 const result = mockKpis;
                 
                 if (repoUrl && repoUrl !== '' && repoUrl !== repoFromStore) {
@@ -65,6 +96,12 @@ const DashboardPage = () => {
         const handleBeforeUnload = (e) => {
             e.preventDefault();
             e.returnValue = '';
+            //---new code---
+            // to prevent duplicate requests
+            if (eventSource) {
+              eventSource.close();
+            }
+            //-----------
         };
 
         launch();
@@ -72,11 +109,23 @@ const DashboardPage = () => {
         
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
+          //---new code------
+          //to prevent duplicate requests
+          if (eventSource) {
+            eventSource.close();
+          }
+          //-----------
         };
     }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        //---new code------
+        //to prevent duplicate requests
+        if (eventSource) {
+          eventSource.close();
+        }
+        //-----------
         await fetchKpis(repoUrl)
     };
 
@@ -144,6 +193,18 @@ const DashboardPage = () => {
                     <IssuerFailureTable data={kpis.AverageFaillureRatePerIssuer}/>
                 </div>
             </div>
+            {/*------ new code--------*/}
+            {/* to display new received data*/}
+            <div>test react</div>
+            {streamedKpis && (
+                <div className="mt-8 p-4 bg-gray-100 rounded">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">Mise a jour des KPIs en temps reel</h3>
+                    <pre className="text-sm text-gray-700 overflow-auto max-h-96">
+                        {JSON.stringify(streamedKpis, null, 2)}
+                    </pre>
+                </div>
+            )}
+            {/*-----------------*/}
         </div>
     )
 }

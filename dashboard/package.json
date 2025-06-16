@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently \"npm run frontend\" \"npm run backend\"",
     "frontend": "vite",
-    "backend": "cd ../ && pipenv run uvicorn backend.app:app --reload",
+    "backend": "cd ../backend && pipenv run uvicorn app:app --reload",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

@@ -17,6 +17,7 @@ const DashboardPage = () => {
     const [eventSource, setEventSource] = useState(null)
     const [kpis, setKpis] = useState({});
     const [selectedWorkflows, setSelectedWorkflows] = useState([]);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const fetchKpis = async (repo) => {
         if (repo.trim()) {
@@ -46,7 +47,7 @@ const DashboardPage = () => {
                     console.error("Error SSE: ",e);
                     source.close();
                 };
-                
+
                 await new Promise((resolve) => setTimeout(resolve, 5000));
 
                 await fetch("http://localhost:8000/api/refresh", {
@@ -56,7 +57,7 @@ const DashboardPage = () => {
                     },
                     body: JSON.stringify({ repo_url: repoFromStore, token: token }),
                 });
-                
+
                 if (repoUrl && repoUrl !== '' && repoUrl !== repoFromStore) {
                     saveNewRepoUrl(repoUrl);
                 }
@@ -85,7 +86,7 @@ const DashboardPage = () => {
 
         launch();
         window.addEventListener('beforeunload', handleBeforeUnload);
-        
+
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
@@ -151,24 +152,24 @@ const DashboardPage = () => {
     const allWorkflowNames = useMemo(() => {
         return kpis.AverageFaillureRatePerWorkflow ? kpis.AverageFaillureRatePerWorkflow.map(wf => wf.workflow_name) : [];
     }, [kpis.AverageFaillureRatePerWorkflow]);
-    
+
     return (
-        <div className="h-screen flex">
+        <div className="min-h-screen flex flex-col md:flex-row relative min-w-[360px]">
             <SideMenu
                 workflows={allWorkflowNames}
                 selectedWorkflows={selectedWorkflows}
                 onWorkflowToggle={handleWorkflowToggle}
             />
-            <div className="flex-1 p-8 bg-white flex flex-col overflow-hidden">
-                <div className="flex flex-row items-baseline justify-center gap-2">
-                    <h2 className="text-5xl text-blue-600 font-semibold mb-6 mr-auto">{repoName}</h2>
-                    <form onSubmit={handleSubmit} className="flex gap-2">
+            <div className="flex-1 p-4 pt-20 md:pt-8 md:p-8 bg-white flex flex-col overflow-hidden">
+                <div className="flex flex-col items-center gap-4 md:flex-row md:items-baseline md:justify-center md:gap-2">
+                    <h2 className="text-3xl text-blue-600 font-semibold text-center md:text-left md:mb-6 md:mr-auto">{repoName}</h2>
+                    <form onSubmit={handleSubmit} className="flex flex-col items-center md:flex-row gap-2 w-full md:w-auto">
                         <input
                             type="text"
                             value={repoUrl}
                             onChange={(e) => setRepoUrl(e.target.value)}
                             placeholder="https://github.com/user/repo"
-                            className="border border-gray-300 px-4 py-2 rounded w-96"
+                            className="border border-gray-300 px-4 py-2 rounded w-full md:w-96"
                         />
                         <button
                             type="submit"
@@ -179,13 +180,13 @@ const DashboardPage = () => {
                     </form>
                 </div>
                 <div className="divide-y divide-gray-200 flex-1 flex flex-col overflow-hidden">
-                    <div className="grid grid-cols-4 gap-10 mb-3">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 mb-6">
                         <WorkflowStddevChart data={filteredWorkflowStddev}/>
                         <AveragePassedTestsChart data={filteredAveragePassedTests} />
                         <AverageChangedTestsChart data={filteredAverageChangedTests} />
                         <AverageFailedWorkflowExecutionTimeChart data={filteredAverageFailedWorkflowExecutionTime} />
                     </div>
-                    <div className="grid grid-cols-2 gap-10 flex-1 flex flex-col overflow-hidden">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 flex-1 overflow-hidden">
                         <WorkflowFailureChart data={filteredWorkflowFailures}/>
                         <IssuerFailureTable data={kpis.AverageFaillureRatePerIssuer}/>
                     </div>

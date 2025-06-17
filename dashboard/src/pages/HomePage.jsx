@@ -79,12 +79,12 @@ function HomePage() {
                 <div className={" flex flex-col items-center mb-8 gap-2"}>
                     <h1 className={"text-3xl font-semibold text-blue-600"}>Welcome to GHAminer Dashboard</h1>
                     <p className={"max-w-md text-center text-black leading-6"}>To get started, enter your GitHub token
-                        and the repository URL for which you want to view the dashboard.</p>
+                        and the repository URL for which you want to generate a dashboard.</p>
                 </div>
                 <form onSubmit={handleSubmit} className="w-1/3 mx-auto px-20 py-10 border border-blue-200 rounded-2xl">
 
                     <label className="block mb-4 mt-4">
-                        GitHub Repository :
+                        GitHub repository :
                         <input
                             type="text"
                             placeholder="https://github.com/user/repo"
@@ -95,7 +95,7 @@ function HomePage() {
                         {errors.repo && <p className="text-red-500">{errors.repo}</p>}
                     </label>
                     <label className="block mb-2">
-                        GitHub Token :
+                        GitHub token :
                         <input
                             type="password"
                             placeholder="github_pat_…"
@@ -113,7 +113,7 @@ function HomePage() {
                             isDisabled ? 'bg-gray-200 cursor-not-allowed text-gray-400' : 'bg-blue-600 text-white cursor-pointer hover:bg-blue-700'
                         }`}
                     >
-                        Generate Dashboard
+                        Generate dashboard
                     </button>
                 </form>
             </div>

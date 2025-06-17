@@ -23,7 +23,6 @@ __pycache__/
 
 # Environments
 dashboard/.env
-dashboard/.env.example
 .venv/
 venv/
 env/

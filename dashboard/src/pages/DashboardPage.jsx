@@ -17,7 +17,6 @@ const DashboardPage = () => {
     const [eventSource, setEventSource] = useState(null)
     const [kpis, setKpis] = useState({});
     const [selectedWorkflows, setSelectedWorkflows] = useState([]);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const fetchKpis = async (repo) => {
         if (repo.trim()) {
@@ -154,7 +153,7 @@ const DashboardPage = () => {
     }, [kpis.AverageFaillureRatePerWorkflow]);
 
     return (
-        <div className="min-h-screen flex flex-col md:flex-row relative min-w-[360px]">
+        <div className="min-h-screen xl:h-screen flex flex-col md:flex-row relative min-w-[360px]">
             <SideMenu
                 workflows={allWorkflowNames}
                 selectedWorkflows={selectedWorkflows}
@@ -180,13 +179,13 @@ const DashboardPage = () => {
                     </form>
                 </div>
                 <div className="divide-y divide-gray-200 flex-1 flex flex-col overflow-hidden">
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 mb-6">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 mb-6">
                         <WorkflowStddevChart data={filteredWorkflowStddev}/>
                         <AveragePassedTestsChart data={filteredAveragePassedTests} />
                         <AverageChangedTestsChart data={filteredAverageChangedTests} />
                         <AverageFailedWorkflowExecutionTimeChart data={filteredAverageFailedWorkflowExecutionTime} />
                     </div>
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 flex-1 overflow-hidden">
+                    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 flex flex-1 flex-col overflow-hidden">
                         <WorkflowFailureChart data={filteredWorkflowFailures}/>
                         <IssuerFailureTable data={kpis.AverageFaillureRatePerIssuer}/>
                     </div>

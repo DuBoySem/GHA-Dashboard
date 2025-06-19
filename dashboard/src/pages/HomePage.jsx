@@ -77,7 +77,7 @@ function HomePage() {
         <div className="min-h-screen bg-white py-20 min-w-[320px]">
             <div className="container mx-auto px-4 flex flex-col">
                 <div className={" flex flex-col items-center mb-8 gap-2"}>
-                    <h1 className={"text-3xl font-semibold text-blue-600"}>Welcome to GHAminer Dashboard</h1>
+                    <h1 className={"text-3xl text-center font-semibold text-blue-600"}>Welcome to GHAminer Dashboard</h1>
                     <p className={"max-w-md text-center text-black leading-6"}>To get started, enter your GitHub token
                         and the repository URL for which you want to generate a dashboard.</p>
                 </div>

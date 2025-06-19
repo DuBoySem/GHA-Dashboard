@@ -19,14 +19,13 @@ const SideMenu = ({ workflows, selectedWorkflows, onWorkflowToggle }) => {
                     <ul className="w-full min-w-[240px] flex flex-col items-center gap-2">
                         {workflows.length > 0 ? (
                             workflows.map((workflowName) => (
-                                <li className="w-full" key={workflowName}>
-                                    <SideMenuItem
-                                        workflowName={workflowName}
-                                        isSelected={selectedWorkflows.includes(workflowName)}
-                                        onClick={onWorkflowToggle}
-                                        className="w-full flex justify-center items-center text-center"
-                                    />
-                                </li>
+                                <SideMenuItem
+                                    key={workflowName}
+                                    workflowName={workflowName}
+                                    isSelected={selectedWorkflows.includes(workflowName)}
+                                    onClick={onWorkflowToggle}
+                                    className="w-full flex justify-center items-center text-center"
+                                />
                             ))
                         ) : (
                             <li className="text-gray-500 text-sm">Aucun workflow disponible.</li>

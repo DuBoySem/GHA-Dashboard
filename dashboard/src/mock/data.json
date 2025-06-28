@@ -1,0 +1,122 @@
+{
+  "data": {
+    "AverageFailureRatePerWorkflow": [
+      {
+        "workflow_name": "Build and push California Docker image",
+        "failure_rate": 0.12
+      },
+      {
+        "workflow_name": "Build and push Docker image",
+        "failure_rate": 0.01
+      },
+      {
+        "workflow_name": "Lint Python",
+        "failure_rate": 0.09
+      },
+      {
+        "workflow_name": "Deploy to Production",
+        "failure_rate": 0.05
+      },
+      {
+        "workflow_name": "Run Unit Tests",
+        "failure_rate": 0.00
+      },
+      {
+        "workflow_name": "Security Scan",
+        "failure_rate": 0.15
+      },
+      {
+        "workflow_name": "Code Review Workflow",
+        "failure_rate": 0.03
+      },
+      {
+        "workflow_name": "Database Migration",
+        "failure_rate": 0.20
+      }
+    ],
+    "StdDevWorkflowExecutions": [
+      {
+        "workflow_name": "Build and push California Docker image",
+        "duration_stddev": 6313.61
+      },
+      {
+        "workflow_name": "Build and push Docker image",
+        "duration_stddev": 56062.08
+      },
+      {
+        "workflow_name": "Lint Python",
+        "duration_stddev": 53501.75
+      },
+      {
+        "workflow_name": "Deploy to Production",
+        "duration_stddev": 12000.50
+      },
+      {
+        "workflow_name": "Run Unit Tests",
+        "duration_stddev": 800.25
+      },
+      {
+        "workflow_name": "Security Scan",
+        "duration_stddev": 9500.70
+      },
+      {
+        "workflow_name": "Code Review Workflow",
+        "duration_stddev": 1500.10
+      },
+      {
+        "workflow_name": "Database Migration",
+        "duration_stddev": 22000.90
+      }
+    ],
+    "AverageFaillureRatePerIssuer": [
+      {
+        "issuer_name": "alexobaseki",
+        "failure_rate": 0.1
+      },
+      {
+        "issuer_name": "jessemortenson",
+        "failure_rate": 0.1
+      },
+      {
+        "issuer_name": "showerst",
+        "failure_rate": 0.01
+      },
+      {
+        "issuer_name": "NewAgeAirbender",
+        "failure_rate": 0.02
+      },
+      {
+        "issuer_name": "elseagle",
+        "failure_rate": 0.43
+      },
+      {
+        "issuer_name": "hasna-akbarali",
+        "failure_rate": 0.0
+      },
+      {
+        "issuer_name": "braykuka",
+        "failure_rate": 0.12
+      },
+      {
+        "issuer_name": "nickrecchi",
+        "failure_rate": 0.0
+      },
+      {
+        "issuer_name": "Rkuro",
+        "failure_rate": 0.0
+      },
+      {
+        "issuer_name": "austinhouck",
+        "failure_rate": 0.0
+      },
+      {
+        "issuer_name": "jealob",
+        "failure_rate": 0.0
+      },
+      {
+        "issuer_name": "chrisyamas",
+        "failure_rate": 0.39
+      }
+    ]
+  }
+}

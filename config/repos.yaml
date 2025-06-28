@@ -1,6 +1,0 @@
-# List of GitHub repositories to monitor using GHAminer.
-# Format: org/repo
-
-# Role: Extraction & Pipeline
-repos:
-  - https://github.com/alchemy-fr/Phraseanet

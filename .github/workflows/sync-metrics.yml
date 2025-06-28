@@ -1,4 +1,0 @@
-# GitHub Actions workflow that runs the GHAminer script on a schedule
-# (e.g., every 5 minutes) to fetch fresh CI/CD metrics.
-
-# Role: CI/CD & Integration

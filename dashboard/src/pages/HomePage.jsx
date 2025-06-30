@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {useStore} from '../store/useStore.js';
 
 function HomePage() {
@@ -8,6 +8,21 @@ function HomePage() {
     const [repoUrl, setRepoUrl] = useState('');
     const [errors, setErrors] = useState({});
     const isDisabled = !token.trim() || !repoUrl.trim();
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const repoFromUrl = urlParams.get('repo');
+
+        if (repoFromUrl) {
+            localStorage.setItem('gha_repo_url', repoFromUrl);
+            setRepoUrl(`https://github.com/${repoFromUrl}`);
+        } else {
+            const storedRepoUrl = localStorage.getItem('gha_repo_url');
+            if (storedRepoUrl) {
+                setRepoUrl(`https://github.com/${storedRepoUrl}`);
+            }
+        }
+    }, []);
 
     const handleTokenChange = (e) => {
         setToken(e.target.value);

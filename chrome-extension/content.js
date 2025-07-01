@@ -1,7 +1,7 @@
 function handleCiCdClick(e, triggerEl) {
   e.preventDefault();
 
-  // Always deselect all tabs
+  // Always deselect all tabs before setting CI/CD
   document.querySelectorAll('.UnderlineNav-item').forEach(el => {
     el.classList.remove('selected', 'js-selected-navigation-item');
     el.removeAttribute('aria-current');
@@ -11,37 +11,50 @@ function handleCiCdClick(e, triggerEl) {
   const existingPlaceholder = document.querySelector('#ci-cd-placeholder');
   if (existingPlaceholder) existingPlaceholder.remove();
 
+  // GitHub may reapply selected classes async — enforce removal
+  setTimeout(() => {
+    document.querySelectorAll('.UnderlineNav-item.selected').forEach(el => {
+      if (el !== triggerEl) {
+        el.classList.remove('selected', 'js-selected-navigation-item');
+        el.removeAttribute('aria-current');
+      }
+    });
+  }, 0);
+
   // Force re-select even if already selected
   triggerEl.classList.add('selected', 'js-selected-navigation-item');
   triggerEl.setAttribute('aria-current', 'page');
 
-  // Reinject the placeholder content
-  const appMain = document.querySelector('.application-main');
-  if (appMain) {
-    const [owner, repo] = window.location.pathname.split('/').slice(1, 3);
-    const repoUrl = `https://github.com/${owner}/${repo}`;
-    localStorage.setItem('gha_repo_url', repoUrl);
-    appMain.innerHTML = `
-      <div class="application-main" data-commit-hovercards-enabled="" data-discussion-hovercards-enabled="" data-issue-and-pr-hovercards-enabled="" data-project-hovercards-enabled="">
-        <div itemscope="" itemtype="http://schema.org/SoftwareSourceCode" class="">
-          <main id="js-repo-pjax-container">
-            <div id="repository-container-header" data-turbo-replace="" hidden=""></div>
-            <turbo-frame id="repo-content-turbo-frame" target="_top" data-turbo-action="advance" class="">
-              <div id="repo-content-pjax-container" class="repository-content ">
-                <div id="ci-cd-placeholder" style="width:100%;height:100vh;overflow:hidden;">
-                  <iframe src="http://localhost:5173/?repo=${encodeURIComponent(repoUrl)}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+  // Only inject if not already on a GitHub-native tab
+  // Reinject the placeholder content only if #ci-cd is in the URL hash
+  if (window.location.hash.includes('ci-cd')) {
+    const appMain = document.querySelector('.application-main');
+    if (appMain) {
+      const [owner, repo] = window.location.pathname.split('/').slice(1, 3);
+      const repoUrl = `https://github.com/${owner}/${repo}`;
+      localStorage.setItem('gha_repo_url', repoUrl);
+      appMain.innerHTML = `
+        <div class="application-main" data-commit-hovercards-enabled="" data-discussion-hovercards-enabled="" data-issue-and-pr-hovercards-enabled="" data-project-hovercards-enabled="">
+          <div itemscope="" itemtype="http://schema.org/SoftwareSourceCode" class="">
+            <main id="js-repo-pjax-container">
+              <div id="repository-container-header" data-turbo-replace="" hidden=""></div>
+              <turbo-frame id="repo-content-turbo-frame" target="_top" data-turbo-action="advance" class="">
+                <div id="repo-content-pjax-container" class="repository-content ">
+                  <div id="ci-cd-placeholder" style="width:100%;height:100vh;overflow:hidden;">
+                    <iframe src="http://localhost:5173/?repo=${encodeURIComponent(repoUrl)}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+                  </div>
                 </div>
-              </div>
-            </turbo-frame>
-          </main>
+              </turbo-frame>
+            </main>
+          </div>
         </div>
-      </div>
-    `;
+      `;
 
-    // Re-attach the CI/CD click listener
-    const newCiCdTab = document.querySelector('[data-tab-item="ci-cd-tab"]');
-    if (newCiCdTab) {
-      newCiCdTab.addEventListener('click', (ev) => handleCiCdClick(ev, newCiCdTab));
+      // Re-attach the CI/CD click listener
+      const newCiCdTab = document.querySelector('[data-tab-item="ci-cd-tab"]');
+      if (newCiCdTab) {
+        newCiCdTab.addEventListener('click', (ev) => handleCiCdClick(ev, newCiCdTab));
+      }
     }
   }
 
@@ -50,6 +63,7 @@ function handleCiCdClick(e, triggerEl) {
   if (repoHeader) {
     repoHeader.textContent = '';
   }
+
 }
 
 try {
@@ -76,7 +90,10 @@ try {
 
     const [_, owner, repo] = window.location.pathname.split('/');
     const tab = document.createElement('a');
-    const handleClick = (e) => handleCiCdClick(e, tab);
+    const handleClick = (e) => {
+      history.replaceState(null, '', `${window.location.pathname}#ci-cd`);
+      handleCiCdClick(e, tab);
+    };
     tab.className = 'UnderlineNav-item no-wrap js-responsive-underlinenav-item';
     tab.id = 'cicd-tab';
     tab.href = '#';
@@ -93,6 +110,19 @@ try {
     tab.setAttribute('data-view-component', 'true');
 
     tab.addEventListener('click', handleClick);
+
+    // Force full reload for native GitHub tabs
+    document.querySelectorAll('.UnderlineNav-item').forEach(t => {
+      const isCiCd = t.getAttribute('data-tab-item') === 'ci-cd-tab';
+      if (!isCiCd) {
+        t.addEventListener('click', (e) => {
+          // Do not prevent default, allow dropdowns to work natively
+          if (t.href && !t.href.endsWith('#')) {
+            window.location.href = t.href;
+          }
+        });
+      }
+    });
 
     tab.innerHTML = `
       <svg class="octicon" aria-hidden="true" height="16" viewBox="0 0 16 16" width="16">
@@ -114,7 +144,8 @@ try {
       const dropdownLink = document.createElement('a');
       dropdownLink.className = 'ActionListContent ActionListContent--visual16';
       dropdownLink.id = 'cicd-tab-dropdown';
-      dropdownLink.href = '#';
+      const [owner, repo] = window.location.pathname.split('/').slice(1, 3);
+      dropdownLink.href = `https://github.com/${owner}/${repo}#ci-cd`;
       dropdownLink.setAttribute('role', 'menuitem');
       dropdownLink.setAttribute('tabindex', '-1');
       dropdownLink.setAttribute('data-view-component', 'true');
@@ -144,7 +175,10 @@ try {
         dropdownUl.appendChild(newDropdownLi);
       }
 
-      dropdownLink.addEventListener('click', handleClick);
+      dropdownLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        handleClick(e);
+      });
     }
 
     if (insightsTab) {
@@ -173,9 +207,8 @@ try {
       navBar.appendChild(fallbackItem);
     }
 
-    const currentPath = window.location.pathname;
-    const expectedPath = `/${owner}/${repo}`;
-    if (currentPath === expectedPath) {
+    // Only trigger handleCiCdClick if explicitly navigating to #ci-cd in the hash
+    if (window.location.hash === '#ci-cd') {
       handleCiCdClick(new MouseEvent('click'), tab);
     }
   })();

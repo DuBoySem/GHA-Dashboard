@@ -1,3 +1,55 @@
+function handleCiCdClick(e, triggerEl) {
+  e.preventDefault();
+
+  // Always deselect all tabs
+  document.querySelectorAll('.UnderlineNav-item').forEach(el => {
+    el.classList.remove('selected', 'js-selected-navigation-item');
+    el.removeAttribute('aria-current');
+  });
+
+  // Remove previously injected CI/CD placeholder if any
+  const existingPlaceholder = document.querySelector('#ci-cd-placeholder');
+  if (existingPlaceholder) existingPlaceholder.remove();
+
+  // Force re-select even if already selected
+  triggerEl.classList.add('selected', 'js-selected-navigation-item');
+  triggerEl.setAttribute('aria-current', 'page');
+
+  // Reinject the placeholder content
+  const appMain = document.querySelector('.application-main');
+  if (appMain) {
+    appMain.innerHTML = `
+      <div class="application-main" data-commit-hovercards-enabled="" data-discussion-hovercards-enabled="" data-issue-and-pr-hovercards-enabled="" data-project-hovercards-enabled="">
+        <div itemscope="" itemtype="http://schema.org/SoftwareSourceCode" class="">
+          <main id="js-repo-pjax-container">
+            <div id="repository-container-header" data-turbo-replace="" hidden=""></div>
+            <turbo-frame id="repo-content-turbo-frame" target="_top" data-turbo-action="advance" class="">
+              <div id="repo-content-pjax-container" class="repository-content ">
+                <div id="ci-cd-placeholder" style="padding:2rem;">
+                  <h1 style="font-size: 24px;">CI/CD Metrics</h1>
+                  <p>This is a placeholder for future dashboard content.</p>
+                </div>
+              </div>
+            </turbo-frame>
+          </main>
+        </div>
+      </div>
+    `;
+
+    // Re-attach the CI/CD click listener
+    const newCiCdTab = document.querySelector('[data-tab-item="ci-cd-tab"]');
+    if (newCiCdTab) {
+      newCiCdTab.addEventListener('click', (ev) => handleCiCdClick(ev, newCiCdTab));
+    }
+  }
+
+  // Optionally reset header (clearing existing one)
+  const repoHeader = document.querySelector('#repository-container-header');
+  if (repoHeader) {
+    repoHeader.textContent = '';
+  }
+}
+
 try {
   console.log("🔥 CI/CD extension loaded 22");
   // Always update the stored repo URL for context, regardless of page
@@ -20,13 +72,14 @@ try {
 
     const [_, owner, repo] = window.location.pathname.split('/');
     const tab = document.createElement('a');
+    const handleClick = (e) => handleCiCdClick(e, tab);
     tab.className = 'UnderlineNav-item no-wrap js-responsive-underlinenav-item';
     tab.id = 'cicd-tab';
-    tab.href = `/${owner}/${repo}`;
+    tab.href = '#';
+    tab.removeAttribute('data-pjax');
+    tab.removeAttribute('data-turbo-frame');
     tab.setAttribute('data-tab-item', 'ci-cd-tab');
     tab.setAttribute('data-selected-links', '/satnam-walia/gha-dashboard-pipeline');
-    tab.setAttribute('data-pjax', '#repo-content-pjax-container');
-    tab.setAttribute('data-turbo-frame', 'repo-content-turbo-frame');
     tab.setAttribute('data-analytics-event', JSON.stringify({
       category: "Underline navbar",
       action: "Click tab",
@@ -34,59 +87,9 @@ try {
       target: "UNDERLINE_NAV.TAB"
     }));
     tab.setAttribute('data-view-component', 'true');
-    // tab.target = '_blank';
-    tab.addEventListener('click', (e) => {
-      e.preventDefault();
-      // Remove selected class from all tabs
-      document.querySelectorAll('.UnderlineNav-item').forEach(el => {
-        el.classList.remove('selected', 'js-selected-navigation-item');
-      });
 
-      // Deselect the default selected nav item (e.g., Code)
-      const defaultSelected = document.querySelector('.UnderlineNav-item.selected');
-      if (defaultSelected) {
-        defaultSelected.classList.remove('selected', 'js-selected-navigation-item');
-      }
+    tab.addEventListener('click', handleClick);
 
-      // Add selected classes to CI/CD tab
-      tab.classList.add('selected', 'js-selected-navigation-item');
-
-      // Hide selection on Code tab when CI/CD is selected
-      const codeTab = document.querySelector('a[data-tab-item="i0code-tab"]');
-      if (codeTab) {
-        codeTab.removeAttribute('aria-current');
-        codeTab.classList.remove('selected', 'js-selected-navigation-item');
-      }
-
-      const contentArea = document.querySelector('#repo-content-pjax-container');
-      if (contentArea) {
-        contentArea.innerHTML = `
-          <div id="ci-cd-placeholder" style="padding:2rem;">
-            <h1 style="font-size: 24px;">CI/CD Metrics</h1>
-            <p>This is a placeholder for future dashboard content.</p>
-          </div>
-        `;
-      }
-
-      const repoHeader = document.querySelector('#repository-container-header');
-      if (repoHeader) {
-        repoHeader.textContent = ''; // remove previous header content
-      }
-    });
-
-    // tab.addEventListener('click', (e) => {
-    //   e.preventDefault();
-    //   // if (document.querySelector('#gha-dashboard-frame')) return;
-    //   // const iframe = document.createElement('iframe');
-    //   // iframe.id = 'gha-dashboard-frame';
-    //   // iframe.src = `http://localhost:5173`;
-    //   // iframe.style = 'position:fixed;top:60px;right:20px;width:420px;height:80vh;z-index:10000;border:1px solid #ccc;border-radius:6px;background:white;';
-    //   // document.body.appendChild(iframe);
-    //   const [_, owner, repo] = window.location.pathname.split('/');
-    //   // Navigate to dashboard view like GitHub's native tab content
-    //   window.location.pathname = `/${owner}/${repo}/actions/dashboard`;
-    // });
-    //tab.href = `https://gha-dashboard.vercel.app?repo=${owner}/${repo}`;
     tab.innerHTML = `
       <svg class="octicon" aria-hidden="true" height="16" viewBox="0 0 16 16" width="16">
         <path fill-rule="evenodd" d="M3 2.5a.5.5 0 01.5.5v9a.5.5 0 01-1 0v-9a.5.5 0 01.5-.5zm4.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0v-6a.5.5 0 01.5-.5zm4 0a.5.5 0 01.5.5v3a.5.5 0 01-1 0v-3a.5.5 0 01.5-.5z"></path>
@@ -107,7 +110,7 @@ try {
       const dropdownLink = document.createElement('a');
       dropdownLink.className = 'ActionListContent ActionListContent--visual16';
       dropdownLink.id = 'cicd-tab-dropdown';
-      dropdownLink.href = `/${owner}/${repo}`;
+      dropdownLink.href = '#';
       dropdownLink.setAttribute('role', 'menuitem');
       dropdownLink.setAttribute('tabindex', '-1');
       dropdownLink.setAttribute('data-view-component', 'true');
@@ -137,40 +140,7 @@ try {
         dropdownUl.appendChild(newDropdownLi);
       }
 
-      dropdownLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.querySelectorAll('.UnderlineNav-item').forEach(el => {
-          el.classList.remove('selected', 'js-selected-navigation-item');
-        });
-
-        const defaultSelected = document.querySelector('.UnderlineNav-item.selected');
-        if (defaultSelected) {
-          defaultSelected.classList.remove('selected', 'js-selected-navigation-item');
-        }
-
-        tab.classList.add('selected', 'js-selected-navigation-item');
-
-        const codeTab = document.querySelector('a[data-tab-item="i0code-tab"]');
-        if (codeTab) {
-          codeTab.removeAttribute('aria-current');
-          codeTab.classList.remove('selected', 'js-selected-navigation-item');
-        }
-
-        const contentArea = document.querySelector('#repo-content-pjax-container');
-        if (contentArea) {
-          contentArea.innerHTML = `
-            <div id="ci-cd-placeholder" style="padding:2rem;">
-              <h1 style="font-size: 24px;">CI/CD Metrics</h1>
-              <p>This is a placeholder for future dashboard content.</p>
-            </div>
-          `;
-        }
-
-        const repoHeader = document.querySelector('#repository-container-header');
-        if (repoHeader) {
-          repoHeader.textContent = '';
-        }
-      });
+      dropdownLink.addEventListener('click', handleClick);
     }
 
     if (insightsTab) {
@@ -180,7 +150,7 @@ try {
       ciItem.setAttribute('data-view-component', 'true');
 
       // Copy classes and attributes for consistency
-      tab.classList.add('js-selected-navigation-item');
+      // Removed: tab.classList.add('js-selected-navigation-item');
       tab.style.visibility = insightsTab.style.visibility === 'hidden' ? 'hidden' : 'visible';
 
       ciItem.appendChild(tab);
@@ -197,6 +167,12 @@ try {
       fallbackItem.setAttribute('data-view-component', 'true');
       fallbackItem.appendChild(tab);
       navBar.appendChild(fallbackItem);
+    }
+
+    const currentPath = window.location.pathname;
+    const expectedPath = `/${owner}/${repo}`;
+    if (currentPath === expectedPath) {
+      handleCiCdClick(new MouseEvent('click'), tab);
     }
   })();
 } catch (error) {

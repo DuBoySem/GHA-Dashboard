@@ -18,6 +18,9 @@ function handleCiCdClick(e, triggerEl) {
   // Reinject the placeholder content
   const appMain = document.querySelector('.application-main');
   if (appMain) {
+    const [owner, repo] = window.location.pathname.split('/').slice(1, 3);
+    const repoUrl = `https://github.com/${owner}/${repo}`;
+    localStorage.setItem('gha_repo_url', repoUrl);
     appMain.innerHTML = `
       <div class="application-main" data-commit-hovercards-enabled="" data-discussion-hovercards-enabled="" data-issue-and-pr-hovercards-enabled="" data-project-hovercards-enabled="">
         <div itemscope="" itemtype="http://schema.org/SoftwareSourceCode" class="">
@@ -25,9 +28,8 @@ function handleCiCdClick(e, triggerEl) {
             <div id="repository-container-header" data-turbo-replace="" hidden=""></div>
             <turbo-frame id="repo-content-turbo-frame" target="_top" data-turbo-action="advance" class="">
               <div id="repo-content-pjax-container" class="repository-content ">
-                <div id="ci-cd-placeholder" style="padding:2rem;">
-                  <h1 style="font-size: 24px;">CI/CD Metrics</h1>
-                  <p>This is a placeholder for future dashboard content.</p>
+                <div id="ci-cd-placeholder" style="width:100%;height:100vh;overflow:hidden;">
+                  <iframe src="http://localhost:5173/?repo=${encodeURIComponent(repoUrl)}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
                 </div>
               </div>
             </turbo-frame>
@@ -53,7 +55,9 @@ function handleCiCdClick(e, triggerEl) {
 try {
   console.log("🔥 CI/CD extension loaded 22");
   // Always update the stored repo URL for context, regardless of page
-  localStorage.setItem('gha_repo_url', window.location.pathname.split('/').slice(1, 3).join('/'));
+  const [owner, repo] = window.location.pathname.split('/').slice(1, 3);
+  const fullRepoURL = `https://github.com/${owner}/${repo}`;
+  localStorage.setItem('gha_repo_url', fullRepoURL);
   (function () {
     console.log("🔥 Injecting CI/CD tabs", window.location.pathname);
     // const isRepoRoot = /^\/[^/]+\/[^/]+\/?$/.test(window.location.pathname);

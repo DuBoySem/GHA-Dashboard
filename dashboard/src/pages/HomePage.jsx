@@ -14,12 +14,25 @@ function HomePage() {
         const repoFromUrl = urlParams.get('repo');
 
         if (repoFromUrl) {
-            localStorage.setItem('gha_repo_url', repoFromUrl);
-            setRepoUrl(`https://github.com/${repoFromUrl}`);
+            const finalRepo = repoFromUrl.startsWith('http') ? repoFromUrl : `https://github.com/${repoFromUrl}`;
+            localStorage.setItem('gha_repo_url', finalRepo);
+            setRepoUrl(finalRepo);
         } else {
             const storedRepoUrl = localStorage.getItem('gha_repo_url');
             if (storedRepoUrl) {
-                setRepoUrl(`https://github.com/${storedRepoUrl}`);
+                setRepoUrl(storedRepoUrl);
+            } else {
+                try {
+                    const iframeParentUrl = new URL(document.referrer);
+                    const [owner, repo] = iframeParentUrl.pathname.split('/').slice(1, 3);
+                    if (owner && repo) {
+                        const constructedUrl = `https://github.com/${owner}/${repo}`;
+                        localStorage.setItem('gha_repo_url', constructedUrl);
+                        setRepoUrl(constructedUrl);
+                    }
+                } catch (err) {
+                    console.warn("Could not infer repo URL from referrer or pathname.");
+                }
             }
         }
     }, []);
@@ -83,7 +96,7 @@ function HomePage() {
 
             return;
         }
-        
+
         saveToken(token);
         saveRepoUrl(repoUrl);
     };

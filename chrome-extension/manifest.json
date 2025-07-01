@@ -1,23 +1,24 @@
 {
   "manifest_version": 3,
-  "name": "GHAMiner Dashboard",
+  "name": "CI/CD Dashboard",
   "version": "1.0",
-  "description": "Metrics Dashboard to analyze workflows",
-  "permissions": ["scripting","storage","tabs","activeTab"],
-  "host_permissions": ["http://localhost:8000/*"],
-  "background": {
-    "service_worker": "background.js"
-  },
+  "description": "Adds a CI/CD tab to GitHub repo pages linking to your custom dashboard.",
+  "permissions": ["activeTab", "scripting"],
   "content_scripts": [
     {
-      "matches": ["https://github.com/*"],
+      "matches": ["https://github.com/*/*"],
       "js": ["content.js"]
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["bundle.js"],
+      "resources": ["icon.png"],
       "matches": ["<all_urls>"]
     }
-  ]
+  ],
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
 }

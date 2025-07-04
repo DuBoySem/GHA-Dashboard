@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
+import Dashboard from "../dashboard/src/dashboardWrapper.jsx"
 
 export default function App() {
   useEffect(() => {
@@ -24,12 +25,8 @@ export default function App() {
       turboFrame.appendChild(dashboardPanelRoot);
 
       const root = createRoot(dashboardPanelRoot);
-      root.render(
-        <div className="dashboard-container">
-          <h2>Dashboard</h2>
-          <p>placeholder for dashboard</p>
-        </div>
-      );
+      //render real dashboard in github page
+      root.render(<Dashboard />);
     };
 
     // dont duplicate <li> list items

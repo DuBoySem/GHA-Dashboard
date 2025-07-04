@@ -3,8 +3,11 @@
   "name": "GHAMiner Dashboard",
   "version": "1.0",
   "description": "Metrics Dashboard to analyze workflows",
-  "permissions": ["scripting"],
-  "host_permissions": ["https://github.com/*"],
+  "permissions": ["scripting","storage","tabs","activeTab"],
+  "host_permissions": ["http://localhost:8000/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": ["https://github.com/*"],

@@ -3,6 +3,7 @@
 # ─────────────────────────────
 
 dashboard/node_modules/
+extension/node_modules/
 dashboard/dist/
 dashboard/.cache/
 dashboard/.DS_Store

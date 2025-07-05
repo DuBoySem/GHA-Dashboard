@@ -26,16 +26,9 @@ An observability pipeline that extracts GitHub Actions workflow metrics using [G
 > PostgreSQL is not yet integrated — KPIs are currently saved to local CSVs.
 
 
-## ⚙️ Local Setup
+## Setup
 
-### 🔧 Prerequisites
-
-- Python 3.11+
-- Docker (for Redis)
-- GitHub Personal Access Token
-- Chrome browser (for extension)
-
-### 1. Load Chrome Extension
+### 1. Chrome Extension (GitHub Tab UI)
 To inject the dashboard directly into GitHub repo pages:
 ```
 cd extension
@@ -51,23 +44,42 @@ Then:
 5. Visit any GitHub repo you have access to
 6. A new tab named Dashboard will appear
 
+### 2. Backend API + Worker
 
-### 2.Install Dependencies
+#### Prerequisites
+
+- Python 3.11+
+- Docker (for Redis)
+- GitHub Personal Access Token
+- Chrome browser (for extension)
+- GHAminer cloned locally and runnable as a service
+
+#### Install Dependencies
 
 ```
 pipenv install
 ```
-### 3.Start Redis (via Docker)
+#### Start Redis (via Docker)
 ```
 pipenv run redis
 ```
-### 4. Start Backend Services
+#### Start Backend Services
 ```
 pipenv run backend    # FastAPI API
 pipenv run worker     # Celery worker
 ```
 
-### Project Structure
+#### Start GHAminer (as a service)
+
+Make sure GHAminer is available locally (e.g. in the `GHAminer/` folder). Then from the root of the project:
+
+```
+cd GHAminer
+pipenv install
+pipenv run ghaminer
+```
+
+## Project Structure
 ```
 gha-dashboard/
 ├── backend/        # API, Celery tasks, ingestion logic

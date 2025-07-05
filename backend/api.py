@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, StreamingResponse
-from backend.gha_runner import run_ghaminer_if_needed
 from backend.csv_checker import check_csv
+from backend.tasks import run_ghaminer_task
 import logging
 
 router = APIRouter(prefix="/api")
@@ -9,7 +9,7 @@ router = APIRouter(prefix="/api")
 @router.post("/refresh")
 async def refresh(request: Request):
     """
-    Triggers a refresh by running GHAminer for the given repo URL and GitHub token.
+    Triggers a refresh by queuing a Celery task to run GHAminer for the given repo URL and GitHub token.
     """
     data = await request.json()
     repo_url = data.get("repo_url")
@@ -21,10 +21,11 @@ async def refresh(request: Request):
         return JSONResponse(status_code=400, content={"status": "error", "message": "Missing 'token'."})
 
     try:
-        triggered = run_ghaminer_if_needed(repo_url, token)
-        return JSONResponse(content={"status": "refreshed" if triggered else "up-to-date"})
+        # Queue GHAminer via Celery
+        run_ghaminer_task.delay(repo_url, token)
+        return JSONResponse(content={"status": "queued"})
     except Exception as e:
-        logging.exception("Failed to run GHAminer")
+        logging.exception("Failed to queue GHAminer task")
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
 
 @router.get("/csv_checker")

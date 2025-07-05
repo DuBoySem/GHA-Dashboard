@@ -1,112 +1,79 @@
-# GHA Dashboard Pipeline
+# GHA Dashboard
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+![Python](https://img.shields.io/badge/python-3.11%2B-blue)
+![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-blue)
 
-This project builds an automated dashboard that monitors GitHub Actions workflows for a target repository (e.g., `milvus-io/milvus`). It uses the open-source tool **GHAminer** to extract workflow metrics, stores them in **PostgreSQL**, and visualizes insights via **Grafana**.
+An observability pipeline that extracts GitHub Actions workflow metrics using [GHAminer](https://github.com/stilab-ets/GHAminer), processes them with a Python backend, and visualizes KPIs through a standalone or GitHub-integrated dashboard.
 
-## Objectives
+## What It Does
 
-- Automatically extract GitHub Actions workflow data
-- Store metrics in a structured PostgreSQL database
-- Visualize KPIs in an interactive Grafana dashboard
-- Enable future extensions for machine learning (ML) predictions
+- Extracts GitHub Actions build & test metrics via [GHAminer](https://github.com/stilab-ets/GHAminer)
+- Triggers runs through a FastAPI API
+- Queues long-running jobs using Celery + Redis
+- Visualizes results in a frontend dashboard or GitHub Chrome extension
+
 
 ## Tech Stack
 
-| Component      | Purpose                                        |
-|----------------|------------------------------------------------|
-| GHAminer       | Extract GitHub Actions build + test metrics    |
-| Python         | Automate ingestion and transformation scripts  |
-| ReactJS        | Visual dashboard for KPIs and trends           |
+| Component       | Role                                      |
+|----------------|-------------------------------------------|
+| GHAminer        | Extracts workflow and test log metrics    |
+| FastAPI         | Backend API to trigger GHAminer runs      |
+| Celery + Redis  | Background task queue                     |
+| React           | Dashboard rendering (standalone + embedded) |
+| Chrome Extension| Injects dashboard into GitHub UI          |
 
-## Wrapper Setup (Python)
+> PostgreSQL is not yet integrated — KPIs are currently saved to local CSVs.
 
-- Having Python 3.13.2 in your machine
-### 1. Install Dependencies
 
-```bash
+## ⚙️ Local Setup
+
+### 🔧 Prerequisites
+
+- Python 3.11+
+- Docker (for Redis)
+- GitHub Personal Access Token
+- Chrome browser (for extension)
+
+### 1. Load Chrome Extension
+To inject the dashboard directly into GitHub repo pages:
+```
+cd extension
+npm install
+npm run build
+```
+
+Then:
+1. Open chrome://extensions
+2. Enable Developer Mode
+3. Click Load unpacked
+4. Select the extension/dist/ folder
+5. Visit any GitHub repo you have access to
+6. A new tab named Dashboard will appear
+
+
+### 2.Install Dependencies
+
+```
 pipenv install
 ```
-
-> Make sure you have Python 3.11+ and `pipenv` installed.
-
-### 2. Activate Virtual Environment
-
-```bash
-pipenv shell
+### 3.Start Redis (via Docker)
+```
+pipenv run redis
+```
+### 4. Start Backend Services
+```
+pipenv run backend    # FastAPI API
+pipenv run worker     # Celery worker
 ```
 
-### 3. Set up Environment Variables
-
-Create a `.env` file at the root of the project:
-
-```env
-GITHUB_TOKEN=your_personal_access_token
+### Project Structure
 ```
-
-### 4. Run the Backend Server
-
-```bash
-pipenv run uvicorn backend.app:app --reload
+gha-dashboard/
+├── backend/        # API, Celery tasks, ingestion logic
+├── dashboard/      # Standalone React dashboard
+├── extension/      # Chrome extension to inject dashboard in GitHub
+├── output/         # KPI exports (CSV/JSON)
+├── GHAminer/       # GitHub Actions log metrics extractor
+└── Pipfile         # Project dependencies & scripts
 ```
-
-Server will be running at: [http://localhost:8000](http://localhost:8000)
-
-### 5. Trigger GHAMiner Run
-
-Send a POST request to the `/refresh` endpoint:
-
-```http
-POST http://localhost:8000/refresh
-```
-
-## Dashboard Setup (React)
-
-- The Dashboard is the HTML page that will display the data as tables and graphs
-    - Will be hosted by the github pages feature that allows to host publicly a static website (to discuss)
-- The source files are located in the dashboard folder
-- The project uses Webpack to build and generate final files in the docs folder
-- To run the website (Dashboard) locally you will have to:
-    - `cd `into the dashboard folder
-    - run the command: `npm install`
-    - run the command: `npm run dev`
-    - go to the local address given from terminal (use web browser)
-- The data_samples.csv file is here for testing
-    - After uploading it, there will be a table that has the file's content displayed (for now)
-    - Console logs the content of the csv file too
-- Usefull commands:
-    - `npm run build` used to build and bundle the files without running a local server 
-    - `npm run dev` used to build and bundle the files, then to run a local server to test and see the outcome
-
-
-## Project Structure
-
-```text
-gha-dashboard-pipeline/
-├── .github/workflows/     # GitHub Actions scheduler
-├── api/                   # REST API to expose metrics
-├── config/                # Repo and database config files
-├── dashboard/             # Dashboard's source files ; Where we implement the dashboard site
-├── docs/                  # Various documentation
-├── output/                # Optional CSV output of extracted metrics
-├── backend/               # Python scripts for ingestion and data cleaning
-```
-
-## Tracked KPIs
-
-- Workflow success rate
-- Average build duration
-- Top failing workflows
-- PR authors with repeated failures
-- Workflow volume over time
-
-## Future Extensions (ML)
-
-The data pipeline is designed to support future machine learning use cases, such as:
-- Predicting workflow failure likelihood
-- Forecasting build duration
-- Scoring workflow flakiness
-- Clustering logs for failure analysis
-
-
-## License
-
-This project is released under the **MIT License**. See the `LICENSE` file for details.

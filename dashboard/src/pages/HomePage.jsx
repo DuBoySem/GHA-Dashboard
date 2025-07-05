@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {useStore} from '../store/useStore.js';
 
 function HomePage() {
@@ -8,6 +8,34 @@ function HomePage() {
     const [repoUrl, setRepoUrl] = useState('');
     const [errors, setErrors] = useState({});
     const isDisabled = !token.trim() || !repoUrl.trim();
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const repoFromUrl = urlParams.get('repo');
+
+        if (repoFromUrl) {
+            const finalRepo = repoFromUrl.startsWith('http') ? repoFromUrl : `https://github.com/${repoFromUrl}`;
+            localStorage.setItem('gha_repo_url', finalRepo);
+            setRepoUrl(finalRepo);
+        } else {
+            const storedRepoUrl = localStorage.getItem('gha_repo_url');
+            if (storedRepoUrl) {
+                setRepoUrl(storedRepoUrl);
+            } else {
+                try {
+                    const iframeParentUrl = new URL(document.referrer);
+                    const [owner, repo] = iframeParentUrl.pathname.split('/').slice(1, 3);
+                    if (owner && repo) {
+                        const constructedUrl = `https://github.com/${owner}/${repo}`;
+                        localStorage.setItem('gha_repo_url', constructedUrl);
+                        setRepoUrl(constructedUrl);
+                    }
+                } catch (err) {
+                    console.warn("Could not infer repo URL from referrer or pathname.");
+                }
+            }
+        }
+    }, []);
 
     const handleTokenChange = (e) => {
         setToken(e.target.value);
@@ -68,7 +96,7 @@ function HomePage() {
 
             return;
         }
-        
+
         saveToken(token);
         saveRepoUrl(repoUrl);
     };

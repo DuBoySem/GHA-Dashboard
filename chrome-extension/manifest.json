@@ -1,18 +1,22 @@
 {
   "manifest_version": 3,
-  "name": "CI/CD Dashboard",
+  "name": "GHAMiner Dashboard",
   "version": "1.0",
-  "description": "Adds a CI/CD tab to GitHub repo pages linking to your custom dashboard.",
-  "permissions": ["activeTab", "scripting"],
+  "description": "Adds a Dashboard tab to GitHub repo pages linking to your custom dashboard.",
+  "permissions": ["scripting"],
+  "host_permissions": ["https://github.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
-      "matches": ["https://github.com/*/*"],
+      "matches": ["https://github.com/*"],
       "js": ["content.js"]
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["icon.png"],
+      "resources": ["bundle.js", "icon.png"],
       "matches": ["<all_urls>"]
     }
   ],

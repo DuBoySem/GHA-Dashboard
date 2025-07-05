@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "webpack",
-    "backend": "cd ../backend && pipenv run uvicorn app:app --reload",
-    "start":"npm run build && npm run backend"
+    "start":"npm run build"
   },
   "devDependencies": {
     "@babel/core": "^7.27.7",

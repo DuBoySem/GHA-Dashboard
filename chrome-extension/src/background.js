@@ -1,28 +1,25 @@
 let eventSource = null;
 
-// --- SSE CONNECTION event stream to refresh KPIs
-// --- works in background
+// SSE connection to backend /api/csv_checker
 function startSSE() {
-  if (eventSource){
+  if (eventSource) {
     eventSource.close();
     eventSource = null;
   }
+
   eventSource = new EventSource("http://localhost:8000/api/csv_checker");
 
   eventSource.onmessage = (event) => {
     let data;
-    try{
+    try {
       data = JSON.parse(event.data);
-    }
-    catch(e){
-      console.log("failed to fetch data fron event stream: ",e);
+    } catch (e) {
+      console.error("Failed to parse SSE data:", e);
       return;
     }
-    //TODO make sure no errors generated
-    //TODO add a way to determine the repo that is receiving data
-    //sends new data to all github tabs open
+
+    // Broadcast new data to all GitHub tabs
     chrome.tabs.query({ url: "*://github.com/*" }, (tabs) => {
-      console.log("event stream from background.js")
       for (const tab of tabs) {
         chrome.tabs.sendMessage(tab.id, {
           type: "KPI_STREAM",
@@ -35,45 +32,27 @@ function startSSE() {
   eventSource.onerror = (err) => {
     console.error("SSE connection error:", err);
     eventSource.close();
-    // retry after a timeout
-    setTimeout(startSSE, 3000);
+    eventSource = null;
+    setTimeout(startSSE, 3000); // retry after 3 seconds
   };
 }
 
-
-// simple REST route to communicate with API from the react injected code
-// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-//   if (message.type === "REFRESH") {
-//     fetch("http://localhost:8000/api/refresh", {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify(message.payload),
-//     })
-//       .then((res) => res.json())
-//       .then((data) => sendResponse({ success: true, data }))
-//       .catch((error) => sendResponse({ success: false, error }));
-//
-//     return true;
-//   }
-// });
-
+// REST call to /api/refresh when message type is "REFRESH"
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "REFRESH") {
-    (async () => {
-      try {
-        const res = await fetch("http://localhost:8000/api/refresh", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(message.payload),
-        });
-        const data = await res.json();
-        sendResponse({ success: true, data });
-      } catch (error) {
+    fetch("http://localhost:8000/api/refresh", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(message.payload),
+    })
+      .then((res) => res.json())
+      .then((data) => sendResponse({ success: true, data }))
+      .catch((error) => {
+        console.error("/api/refresh request failed:", error);
         sendResponse({ success: false, error: error.message });
-      }
-    })();
+      });
 
-    return true;
+    return true; // required for async sendResponse
   }
 });
 

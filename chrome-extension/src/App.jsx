@@ -41,7 +41,7 @@ export default function App() {
       nav.appendChild(dashboardTab);
     }
 
-    // observe page refreshe 
+    // observe page refreshe
     const observeGitHub = () => {
       const main = document.querySelector("main");
       if (!main) return;

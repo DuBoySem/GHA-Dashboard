@@ -80,7 +80,8 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: "manifest.json", to: "." },
-        { from: "src/background.js", to: "."}
+        { from: "src/background.js", to: "."},
+        { from: "src/icon.png", to: "icon.png" }
       ]
     })
   ],

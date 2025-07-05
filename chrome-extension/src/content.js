@@ -22,4 +22,3 @@ window.addEventListener("message", (event)=>{
   if(event.data.source!=="GHA_DASHBOARD") return;
   chrome.runtime.sendMessage(event.data.message)
 })
-

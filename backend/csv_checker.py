@@ -14,7 +14,7 @@ project_root = root_path.parents[1]
 ghaminer_root = project_root / "GHAminer"  # adjust if GHAminer is elsewhere
 
 # Target files
-csv_path_read = ghaminer_root / "src" / "builds_features.csv"
+csv_path_read = ghaminer_root / "builds_features.csv"
 json_path_write = project_root / "gha-dashboard-pipeline" / "output" / "KPIs.json"
 json_path_write.parent.mkdir(parents=True, exist_ok=True)
 

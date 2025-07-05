@@ -1,40 +1,18 @@
 import json
 import os
-import shutil
-import subprocess
 import sys
 import threading
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
+import requests
+
 BASE_DIR = Path(__file__).resolve().parent.parent
-GHAMINER_PATH = BASE_DIR / "ghaminer"
-GHAMETRICS_PATH = GHAMINER_PATH / "src" / "GHAMetrics.py"
 STATE_FILE = BASE_DIR / "output" / "state.json"
 OUTPUT_DIR = BASE_DIR / "output" / "raw"
 
-
-def clone_or_update_ghaminer():
-    repo_url = "https://github.com/stilab-ets/GHAminer.git"
-
-    if GHAMINER_PATH.exists() and GHAMETRICS_PATH.exists():
-        print("[wrapper] GHAMiner already present. Pulling latest changes...")
-        subprocess.run(["git", "-C", str(GHAMINER_PATH), "pull"], check=True)
-        return
-
-    if GHAMINER_PATH.exists():
-        print(
-            "[wrapper] GHAMiner folder exists but is incomplete. Removing and recloning..."
-        )
-        shutil.rmtree(GHAMINER_PATH)
-
-    subprocess.run(
-        ["git", "clone", repo_url, str(GHAMINER_PATH)],
-        check=True,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.STDOUT,
-    )
-    return
+GHAMINER_API_URL = "http://localhost:8001/run"  # adjust if hosted elsewhere
 
 
 def should_run():
@@ -51,51 +29,23 @@ def should_run():
 
 def run_ghaminer_if_needed(repo_url: str, token: str):
     if not should_run():
-        return
-    print("[wrapper] Ensuring GHAMiner is present...")
-    print("[wrapper] Starting GHAMiner pipeline...")
-    clone_or_update_ghaminer()
-    print("[wrapper] GHAMiner ready.")
-    if not GHAMETRICS_PATH.exists():
-        raise FileNotFoundError("[wrapper] GHAMetrics.py not found")
+        return False
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
     repo_name = repo_url.split("/")[-1].replace(".git", "")
+    print(f"[wrapper] Posting to: {GHAMINER_API_URL}")
+    print(f"[wrapper] Payload: {{'repo_url': '{repo_url}', 'token': 'gith...'}}")
 
-    # execute GHAMiner
-    print(f"[wrapper] Running GHAMiner on {repo_name}...")
-    run_gha_async(repo_url, token)
+    try:
+        response = requests.post(GHAMINER_API_URL, json={"repo_url": repo_url, "token": token})
+        response.raise_for_status()
+        print("[wrapper=>GHAminer] GHAminer API call successful.")
+    except Exception as e:
+        print(f"[wrapper=>GHAminer] API call failed: {e}")
+        return False
 
     STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
     with open(STATE_FILE, "w") as f:
         json.dump({"last_run": datetime.utcnow().isoformat()}, f)
 
-
-# function to set bahaviour of the monitoring thread
-# logs in console success or faillure of GHA's execution
-def gha_monitor(process):
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
-        print("[wrapper=>GHAminer] GHA finished the execution")
-    else:
-        print("[wrapper=> GHAMiner] ERROR!! GHAMiner")
-        print("[wrapper=> GHAMiner] STDOUT: ", stdout)
-        print("[wrapper=> GHAMiner] STDERR: ", stderr)
-
-
-def run_gha_async(repo_url, token):
-    process = subprocess.Popen(
-        [
-            sys.executable,
-            str(GHAMETRICS_PATH),
-            "--s",
-            repo_url,
-            "--token",
-            token,
-        ],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-    # start the thread
-    threading.Thread(target=gha_monitor, args=(process,)).start()
+    return True

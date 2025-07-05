@@ -5,4 +5,4 @@ def run_all():
     try:
         run_ghaminer_if_needed()
     except subprocess.CalledProcessError as e:
-        print(f"❌ GHAMiner failed\n{e}")
+        print(f" GHAMiner failed\n{e}")

@@ -1,5 +1,6 @@
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import {useStore} from '../store/useStore.js';
+import React from "react";
 
 function HomePage() {
     const saveToken = useStore((state) => state.setToken);
@@ -8,34 +9,6 @@ function HomePage() {
     const [repoUrl, setRepoUrl] = useState('');
     const [errors, setErrors] = useState({});
     const isDisabled = !token.trim() || !repoUrl.trim();
-
-    useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const repoFromUrl = urlParams.get('repo');
-
-        if (repoFromUrl) {
-            const finalRepo = repoFromUrl.startsWith('http') ? repoFromUrl : `https://github.com/${repoFromUrl}`;
-            localStorage.setItem('gha_repo_url', finalRepo);
-            setRepoUrl(finalRepo);
-        } else {
-            const storedRepoUrl = localStorage.getItem('gha_repo_url');
-            if (storedRepoUrl) {
-                setRepoUrl(storedRepoUrl);
-            } else {
-                try {
-                    const iframeParentUrl = new URL(document.referrer);
-                    const [owner, repo] = iframeParentUrl.pathname.split('/').slice(1, 3);
-                    if (owner && repo) {
-                        const constructedUrl = `https://github.com/${owner}/${repo}`;
-                        localStorage.setItem('gha_repo_url', constructedUrl);
-                        setRepoUrl(constructedUrl);
-                    }
-                } catch (err) {
-                    console.warn("Could not infer repo URL from referrer or pathname.");
-                }
-            }
-        }
-    }, []);
 
     const handleTokenChange = (e) => {
         setToken(e.target.value);
@@ -96,21 +69,20 @@ function HomePage() {
 
             return;
         }
-
+        
         saveToken(token);
         saveRepoUrl(repoUrl);
     };
 
     return (
-        <div className="min-h-screen bg-white py-20 min-w-[320px]">
-            <div className="container mx-auto px-4 flex flex-col">
+        <div className={"min-h-screen bg-white py-20"}>
+            <div className="flex flex-col mx-auto p-4">
                 <div className={" flex flex-col items-center mb-8 gap-2"}>
-                    <h1 className={"text-3xl text-center font-semibold text-blue-600"}>Welcome to GHAminer Dashboard</h1>
+                    <h1 className={"text-3xl font-semibold text-blue-600"}>Welcome to GHAminer Dashboard</h1>
                     <p className={"max-w-md text-center text-black leading-6"}>To get started, enter your GitHub token
                         and the repository URL for which you want to generate a dashboard.</p>
                 </div>
-                <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto px-6 md:px-20 py-10 border border-blue-200 rounded-2xl">
-
+                <form onSubmit={handleSubmit} className="w-1/3 mx-auto px-20 py-10 border border-blue-200 rounded-2xl">
 
                     <label className="block mb-4 mt-4">
                         GitHub repository :

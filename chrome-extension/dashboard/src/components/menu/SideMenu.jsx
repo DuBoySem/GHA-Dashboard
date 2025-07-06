@@ -1,4 +1,5 @@
 import SideMenuItem from './SideMenuItem.jsx';
+import React from "react";
 
 const SideMenu = ({ workflows, selectedWorkflows, onWorkflowToggle }) => {
     return (

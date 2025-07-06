@@ -3,6 +3,7 @@
 # ─────────────────────────────
 
 dashboard/node_modules/
+chrome-extension/node_modules/
 dashboard/dist/
 dashboard/.cache/
 dashboard/.DS_Store
@@ -110,3 +111,4 @@ ghaminer/
 ghaminer/
 app.log6
 builds_features.csv
+

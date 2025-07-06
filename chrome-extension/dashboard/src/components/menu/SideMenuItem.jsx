@@ -1,7 +1,6 @@
-
+import React from "react";
 const SideMenuItem = ({ workflowName, isSelected, onClick }) => {
-
-    const itemClasses = `sidemenu-item ${isSelected ? 'sidemenu-item-selected' : 'hover:bg-blue-200'} w-full`;
+    const itemClasses = `sidemenu-item ${isSelected ? 'sidemenu-item-selected' : 'hover:bg-blue-200'}`;
 
     return (
         <li className={itemClasses} onClick={() => onClick(workflowName)}>

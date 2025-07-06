@@ -7,6 +7,7 @@ import AverageChangedTestsChart from "../charts/AverageChangedTestsChart.jsx";
 import AverageFailedWorkflowExecutionTimeChart from "../charts/AverageFailedWorkflowExecutionTimeChart.jsx";
 import {useStore} from "../store/useStore.js";
 import SideMenu from "../components/menu/SideMenu.jsx";
+import React from "react";
 
 const DashboardPage = () => {
     const token = useStore((state) => state.token)
@@ -21,42 +22,57 @@ const DashboardPage = () => {
     const fetchKpis = async (repo) => {
         if (repo.trim()) {
             try {
-                if (eventSource) {
-                  eventSource.close();
-                }
+                // if (eventSource) {
+                //   eventSource.close();
+                // }
+                //
+                // const source = new EventSource("http://localhost:8000/api/csv_checker");
+                // setEventSource(source)
+                //
+                // source.onmessage = (event) => {
+                //     try {
+                //         const parsedData = JSON.parse(event.data);
+                //         setKpis(parsedData);
+                //
+                //         if (parsedData?.StdDevWorkflowExecutions) {
+                //             const allWorkflows = parsedData.StdDevWorkflowExecutions.map(wf => wf.workflow_name);
+                //             setSelectedWorkflows(allWorkflows);
+                //         }
+                //     } catch (e) {
+                //         console.log("Error parsing streamed kpis: ", e);
+                //     }
+                // };
+                //
+                // source.onerror = (e) =>{
+                //     console.error("Error SSE: ",e);
+                //     source.close();
+                // };
+                // 
+                // await new Promise((resolve) => setTimeout(resolve, 5000));
 
-                const source = new EventSource("http://localhost:8000/api/csv_checker");
-                setEventSource(source)
-
-                source.onmessage = (event) => {
-                    try {
-                        const parsedData = JSON.parse(event.data);
-                        setKpis(parsedData);
-
-                        if (parsedData?.StdDevWorkflowExecutions) {
-                            const allWorkflows = parsedData.StdDevWorkflowExecutions.map(wf => wf.workflow_name);
-                            setSelectedWorkflows(allWorkflows);
-                        }
-                    } catch (e) {
-                        console.log("Error parsing streamed kpis: ", e);
+                // sends refresh request
+                window.postMessage(
+                  {
+                    source:"GHA_DASHBOARD",
+                    message:{
+                      type:"REFRESH",
+                      // payload: JSON.stringify({ repo_url: repoFromStore, token: token }),
+                      payload: { repo_url: repoFromStore, token: token },
                     }
-                };
+                    // headers: {
+                    //     "Content-Type": "application/json",
+                    // },
+                  },"*");
 
-                source.onerror = (e) =>{
-                    console.error("Error SSE: ",e);
-                    source.close();
-                };
 
-                await new Promise((resolve) => setTimeout(resolve, 5000));
-
-                await fetch("http://localhost:8000/api/refresh", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ repo_url: repoFromStore, token: token }),
-                });
-
+                // await fetch("http://localhost:8000/api/refresh", {
+                //     method: "POST",
+                //     headers: {
+                //         "Content-Type": "application/json",
+                //     },
+                //     body: JSON.stringify({ repo_url: repoFromStore, token: token }),
+                // });
+                
                 if (repoUrl && repoUrl !== '' && repoUrl !== repoFromStore) {
                     saveNewRepoUrl(repoUrl);
                 }
@@ -70,6 +86,30 @@ const DashboardPage = () => {
     useEffect(() => {
         setRepoName(repoFromStore.split('/').slice(-1)[0]);
 
+        //listen to SSE updates
+        const handleSSEUpdate = msg =>{
+          console.log("in sse handler")
+          //make sure its from the SSE stream
+          if(msg.source !== window) return;
+          if(msg.data.source !== "BACKGROUND_SCRIPT") return;
+          if(msg.data.type==="KPI_STREAM"){
+            try {
+                //parse payload to json
+                // const parsedData = JSON.parse(msg.data.payload);
+                const parsedData = msg.data.payload;
+                // console.log("parsed data prints")
+                console.log("parsed data prints", parsedData);
+                //populate dashboard
+                setKpis(parsedData);
+                if (parsedData?.StdDevWorkflowExecutions) {
+                    const allWorkflows = parsedData.StdDevWorkflowExecutions.map(wf => wf.workflow_name);
+                    setSelectedWorkflows(allWorkflows);
+                }
+            } catch (e) {
+                console.log("Error parsing streamed kpis: ", e);
+            }
+          }
+        }
         const launch = async () => {
             try {
                 await fetchKpis(repoFromStore);
@@ -83,11 +123,13 @@ const DashboardPage = () => {
             e.returnValue = '';
         };
 
+        window.addEventListener("message",handleSSEUpdate);
         launch();
         window.addEventListener('beforeunload', handleBeforeUnload);
-
+        
         return () => {
-            window.removeEventListener('beforeunload', handleBeforeUnload);
+          window.removeEventListener('beforeunload', handleBeforeUnload);
+          window.removeEventListener("message",handleSSEUpdate);
         };
     }, []);
 
@@ -151,28 +193,24 @@ const DashboardPage = () => {
     const allWorkflowNames = useMemo(() => {
         return kpis.AverageFaillureRatePerWorkflow ? kpis.AverageFaillureRatePerWorkflow.map(wf => wf.workflow_name) : [];
     }, [kpis.AverageFaillureRatePerWorkflow]);
-
+    
     return (
-        <div className="min-h-screen xl:h-screen flex flex-col md:flex-row relative min-w-[360px]">
+        <div className="h-screen flex">
             <SideMenu
                 workflows={allWorkflowNames}
                 selectedWorkflows={selectedWorkflows}
                 onWorkflowToggle={handleWorkflowToggle}
             />
-
-            <div className="flex-1 p-4 pt-20 md:pt-8 md:p-8 bg-white flex flex-col overflow-hidden">
-                <div className="flex flex-col items-center gap-4 md:flex-row md:items-baseline md:justify-center md:gap-2">
-                    <h2 className="text-3xl text-blue-600 font-semibold text-center md:text-left md:mb-6 md:mr-auto">{repoName}</h2>
-                    <form onSubmit={handleSubmit} className="flex flex-col items-center md:flex-row gap-2 w-full md:w-auto">
-
+            <div className="flex-1 p-8 bg-white flex flex-col overflow-hidden">
+                <div className="flex flex-row items-baseline justify-center gap-2">
+                    <h2 className="text-5xl text-blue-600 font-semibold mb-6 mr-auto">{repoName}</h2>
+                    <form onSubmit={handleSubmit} className="flex gap-2">
                         <input
                             type="text"
                             value={repoUrl}
                             onChange={(e) => setRepoUrl(e.target.value)}
                             placeholder="https://github.com/user/repo"
-
-                            className="border border-gray-300 px-4 py-2 rounded w-full md:w-96"
-
+                            className="border border-gray-300 px-4 py-2 rounded w-96"
                         />
                         <button
                             type="submit"
@@ -183,17 +221,13 @@ const DashboardPage = () => {
                     </form>
                 </div>
                 <div className="divide-y divide-gray-200 flex-1 flex flex-col overflow-hidden">
-
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 mb-6">
-
+                    <div className="grid grid-cols-4 gap-10 mb-3">
                         <WorkflowStddevChart data={filteredWorkflowStddev}/>
                         <AveragePassedTestsChart data={filteredAveragePassedTests} />
                         <AverageChangedTestsChart data={filteredAverageChangedTests} />
                         <AverageFailedWorkflowExecutionTimeChart data={filteredAverageFailedWorkflowExecutionTime} />
                     </div>
-
-                    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 flex flex-1 flex-col overflow-hidden">
-
+                    <div className="grid grid-cols-2 gap-10 flex-1 flex flex-col overflow-hidden">
                         <WorkflowFailureChart data={filteredWorkflowFailures}/>
                         <IssuerFailureTable data={kpis.AverageFaillureRatePerIssuer}/>
                     </div>

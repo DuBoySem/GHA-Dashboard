@@ -1,4 +1,5 @@
 let eventSource = null;
+let runningSSE = false;
 
 // --- SSE CONNECTION event stream to refresh KPIs
 // --- works in background
@@ -8,6 +9,8 @@ function startSSE() {
     eventSource = null;
   }
   eventSource = new EventSource("http://localhost:8000/api/csv_checker");
+  runningSSE = true;
+  notifyPopup()
 
   eventSource.onmessage = (event) => {
     let data;
@@ -31,31 +34,43 @@ function startSSE() {
       }
     });
   };
+  console.log("SSE connection started")
 
   eventSource.onerror = (err) => {
     console.error("SSE connection error:", err);
     eventSource.close();
+    eventSource = null;
+    runningSSE = false;
+    notifyPopup();
     // retry after a timeout
-    setTimeout(startSSE, 3000);
+    // setTimeout(startSSE, 3000);
   };
 }
+function stopSSE() {
+  if (eventSource) {
+    eventSource.close();
+    eventSource = null;
+    console.log("SSE stopped");
+  }
+  runningSSE=false;
+  notifyPopup();
+}
 
-
-// simple REST route to communicate with API from the react injected code
-// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-//   if (message.type === "REFRESH") {
-//     fetch("http://localhost:8000/api/refresh", {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify(message.payload),
-//     })
-//       .then((res) => res.json())
-//       .then((data) => sendResponse({ success: true, data }))
-//       .catch((error) => sendResponse({ success: false, error }));
-//
-//     return true;
-//   }
-// });
+//notifies popup.html of SSE state
+function notifyPopup() {
+  chrome.runtime.sendMessage({ type: "SSE_STATUS_CHANGED", isRunning: runningSSE });
+}
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "START_SSE") {
+    startSSE();
+  } else if (message.action === "STOP_SSE") {
+    stopSSE();
+  }
+  else if(message.action === "GET_SSE_STATUS"){
+    sendResponse({isRunning: runningSSE})
+  }
+  return true;
+});
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "REFRESH") {
@@ -77,4 +92,3 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-startSSE();

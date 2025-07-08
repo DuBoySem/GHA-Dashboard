@@ -22,34 +22,6 @@ const DashboardPage = () => {
     const fetchKpis = async (repo) => {
         if (repo.trim()) {
             try {
-                // if (eventSource) {
-                //   eventSource.close();
-                // }
-                //
-                // const source = new EventSource("http://localhost:8000/api/csv_checker");
-                // setEventSource(source)
-                //
-                // source.onmessage = (event) => {
-                //     try {
-                //         const parsedData = JSON.parse(event.data);
-                //         setKpis(parsedData);
-                //
-                //         if (parsedData?.StdDevWorkflowExecutions) {
-                //             const allWorkflows = parsedData.StdDevWorkflowExecutions.map(wf => wf.workflow_name);
-                //             setSelectedWorkflows(allWorkflows);
-                //         }
-                //     } catch (e) {
-                //         console.log("Error parsing streamed kpis: ", e);
-                //     }
-                // };
-                //
-                // source.onerror = (e) =>{
-                //     console.error("Error SSE: ",e);
-                //     source.close();
-                // };
-                // 
-                // await new Promise((resolve) => setTimeout(resolve, 5000));
-
                 // sends refresh request
                 window.postMessage(
                   {
@@ -195,7 +167,8 @@ const DashboardPage = () => {
     }, [kpis.AverageFaillureRatePerWorkflow]);
     
     return (
-        <div className="h-screen flex">
+        // <div className="h-screen flex">
+        <div className="min-h-full w-full flex">
             <SideMenu
                 workflows={allWorkflowNames}
                 selectedWorkflows={selectedWorkflows}

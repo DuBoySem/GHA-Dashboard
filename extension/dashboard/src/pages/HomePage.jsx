@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {useStore} from '../store/useStore.js';
 import React from "react";
 
@@ -9,6 +9,16 @@ function HomePage() {
     const [repoUrl, setRepoUrl] = useState('');
     const [errors, setErrors] = useState({});
     const isDisabled = !token.trim() || !repoUrl.trim();
+    
+    //fill repoUrl input field with URL of cuurent repo 
+    useEffect(() => {
+        const currentUrl = window.location.href;
+        const match = currentUrl.match(/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+/);
+
+        if (match) {
+            setRepoUrl(match[0]);
+        }
+    }, []);
 
     const handleTokenChange = (e) => {
         setToken(e.target.value);
@@ -84,25 +94,25 @@ function HomePage() {
                 </div>
                 <form onSubmit={handleSubmit} className="w-1/3 mx-auto px-20 py-10 border border-blue-200 rounded-2xl">
 
-                    <label className="block mb-4 mt-4">
+                    <label className="block mb-4 mt-4 text-blue-600">
                         GitHub repository :
                         <input
                             type="text"
                             placeholder="https://github.com/user/repo"
                             value={repoUrl}
                             onChange={handleRepoChange}
-                            className="w-full border rounded p-2 mt-1"
+                            className="w-full border rounded p-2 mt-1 text-black"
                         />
                         {errors.repo && <p className="text-red-500">{errors.repo}</p>}
                     </label>
-                    <label className="block mb-2">
+                    <label className="block mb-2 text-blue-600">
                         GitHub token :
                         <input
                             type="password"
                             placeholder="github_pat_…"
                             value={token}
                             onChange={handleTokenChange}
-                            className="w-full border rounded p-2 mt-1"
+                            className="w-full border rounded p-2 mt-1 text-black"
                         />
                         {errors.token && <p className="text-red-500">{errors.token}</p>}
                     </label>

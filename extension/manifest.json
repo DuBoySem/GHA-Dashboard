@@ -5,6 +5,9 @@
   "description": "Metrics Dashboard to analyze workflows",
   "permissions": ["scripting","storage","tabs","activeTab"],
   "host_permissions": ["http://localhost:8000/*"],
+  "action": {
+    "default_popup": "popup.html"
+  },
   "background": {
     "service_worker": "background.js"
   },

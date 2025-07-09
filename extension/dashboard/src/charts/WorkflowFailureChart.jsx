@@ -10,8 +10,6 @@ import {
 
 import FailureTooltip from '../components/FailureTooltip.jsx';
 
-const COLORS = ['#60a5fa', '#facc15', '#4ade80', '#f87171', '#a78bfa', '#f472b6']
-
 const WorkflowFailureChart = ({data}) => {
     if (!data || data.length === 0) {
         return (

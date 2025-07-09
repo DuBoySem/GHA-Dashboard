@@ -4,7 +4,7 @@
   "scripts": {
     "build": "webpack",
     "backend": "cd ../backend && pipenv run uvicorn app:app --reload",
-    "start":"npm run build && npm run backend"
+    "start": "npm run build && npm run backend"
   },
   "devDependencies": {
     "@babel/core": "^7.27.7",
@@ -37,12 +37,15 @@
     "recharts": "^3.0.2",
     "style-loader": "^4.0.0",
     "tailwindcss": "^4.1.11",
+    "tailwindcss-webpack-plugin": "^0.0.12",
     "webpack": "^5.99.9",
     "webpack-cli": "^6.0.1",
     "webpack-encoding-plugin": "^0.3.1",
     "zustand": "^5.0.6"
   },
   "dependencies": {
+    "d3-scale-chromatic": "^3.1.0",
+    "mini-css-extract-plugin": "^2.9.2",
     "npm-check-updates": "^18.0.1"
   }
 }

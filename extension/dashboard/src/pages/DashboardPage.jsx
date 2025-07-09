@@ -8,7 +8,7 @@ import AverageFailedWorkflowExecutionTimeChart from "../charts/AverageFailedWork
 import {useStore} from "../store/useStore.js";
 import SideMenu from "../components/menu/SideMenu.jsx";
 import React from "react";
-
+import * as d3 from "d3-scale-chromatic";
 const DashboardPage = () => {
     const token = useStore((state) => state.token)
     const repoFromStore = useStore((state) => state.repoUrl)
@@ -24,17 +24,17 @@ const DashboardPage = () => {
             try {
                 // sends refresh request
                 window.postMessage(
-                  {
-                    source:"GHA_DASHBOARD",
-                    message:{
-                      type:"REFRESH",
-                      // payload: JSON.stringify({ repo_url: repoFromStore, token: token }),
-                      payload: { repo_url: repoFromStore, token: token },
-                    }
-                    // headers: {
-                    //     "Content-Type": "application/json",
-                    // },
-                  },"*");
+                    {
+                        source:"GHA_DASHBOARD",
+                        message:{
+                            type:"REFRESH",
+                            // payload: JSON.stringify({ repo_url: repoFromStore, token: token }),
+                            payload: { repo_url: repoFromStore, token: token },
+                        }
+                        // headers: {
+                        //     "Content-Type": "application/json",
+                        // },
+                    },"*");
 
 
                 // await fetch("http://localhost:8000/api/refresh", {
@@ -44,7 +44,7 @@ const DashboardPage = () => {
                 //     },
                 //     body: JSON.stringify({ repo_url: repoFromStore, token: token }),
                 // });
-                
+
                 if (repoUrl && repoUrl !== '' && repoUrl !== repoFromStore) {
                     saveNewRepoUrl(repoUrl);
                 }
@@ -60,27 +60,27 @@ const DashboardPage = () => {
 
         //listen to SSE updates
         const handleSSEUpdate = msg =>{
-          console.log("in sse handler")
-          //make sure its from the SSE stream
-          if(msg.source !== window) return;
-          if(msg.data.source !== "BACKGROUND_SCRIPT") return;
-          if(msg.data.type==="KPI_STREAM"){
-            try {
-                //parse payload to json
-                // const parsedData = JSON.parse(msg.data.payload);
-                const parsedData = msg.data.payload;
-                // console.log("parsed data prints")
-                console.log("parsed data prints", parsedData);
-                //populate dashboard
-                setKpis(parsedData);
-                if (parsedData?.StdDevWorkflowExecutions) {
-                    const allWorkflows = parsedData.StdDevWorkflowExecutions.map(wf => wf.workflow_name);
-                    setSelectedWorkflows(allWorkflows);
+            console.log("in sse handler")
+            //make sure its from the SSE stream
+            if(msg.source !== window) return;
+            if(msg.data.source !== "BACKGROUND_SCRIPT") return;
+            if(msg.data.type==="KPI_STREAM"){
+                try {
+                    //parse payload to json
+                    // const parsedData = JSON.parse(msg.data.payload);
+                    const parsedData = msg.data.payload;
+                    // console.log("parsed data prints")
+                    console.log("parsed data prints", parsedData);
+                    //populate dashboard
+                    setKpis(parsedData);
+                    if (parsedData?.StdDevWorkflowExecutions) {
+                        const allWorkflows = parsedData.StdDevWorkflowExecutions.map(wf => wf.workflow_name);
+                        setSelectedWorkflows(allWorkflows);
+                    }
+                } catch (e) {
+                    console.log("Error parsing streamed kpis: ", e);
                 }
-            } catch (e) {
-                console.log("Error parsing streamed kpis: ", e);
             }
-          }
         }
         const launch = async () => {
             try {
@@ -98,10 +98,10 @@ const DashboardPage = () => {
         window.addEventListener("message",handleSSEUpdate);
         launch();
         window.addEventListener('beforeunload', handleBeforeUnload);
-        
+
         return () => {
-          window.removeEventListener('beforeunload', handleBeforeUnload);
-          window.removeEventListener("message",handleSSEUpdate);
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            window.removeEventListener("message",handleSSEUpdate);
         };
     }, []);
 
@@ -165,7 +165,13 @@ const DashboardPage = () => {
     const allWorkflowNames = useMemo(() => {
         return kpis.AverageFaillureRatePerWorkflow ? kpis.AverageFaillureRatePerWorkflow.map(wf => wf.workflow_name) : [];
     }, [kpis.AverageFaillureRatePerWorkflow]);
-    
+
+    const colorMap = useMemo(() => {
+        return Object.fromEntries(
+            allWorkflowNames.map((workflowName, index) => [workflowName, d3.schemeCategory10[index % 10]])
+        );
+    }, [allWorkflowNames]);
+
     return (
         // <div className="h-screen flex">
         <div className="min-h-full w-full flex">
@@ -173,32 +179,18 @@ const DashboardPage = () => {
                 workflows={allWorkflowNames}
                 selectedWorkflows={selectedWorkflows}
                 onWorkflowToggle={handleWorkflowToggle}
+                colorsMap={colorMap}
             />
             <div className="flex-1 p-8 bg-white flex flex-col overflow-hidden">
                 <div className="flex flex-row items-baseline justify-center gap-2">
-                    <h2 className="text-5xl text-blue-600 font-semibold mb-6 mr-auto">{repoName}</h2>
-                    <form onSubmit={handleSubmit} className="flex gap-2">
-                        <input
-                            type="text"
-                            value={repoUrl}
-                            onChange={(e) => setRepoUrl(e.target.value)}
-                            placeholder="https://github.com/user/repo"
-                            className="border border-gray-300 px-4 py-2 rounded w-96"
-                        />
-                        <button
-                            type="submit"
-                            className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                        >
-                            Analyse GitHub repo
-                        </button>
-                    </form>
+                    <h2 className="text-5xl text-black font-semibold mr-auto">{repoName}</h2>
                 </div>
                 <div className="divide-y divide-gray-200 flex-1 flex flex-col overflow-hidden">
                     <div className="grid grid-cols-4 gap-10 mb-3">
-                        <WorkflowStddevChart data={filteredWorkflowStddev}/>
-                        <AveragePassedTestsChart data={filteredAveragePassedTests} />
-                        <AverageChangedTestsChart data={filteredAverageChangedTests} />
-                        <AverageFailedWorkflowExecutionTimeChart data={filteredAverageFailedWorkflowExecutionTime} />
+                        <WorkflowStddevChart data={filteredWorkflowStddev} colorMap={colorMap} />
+                        <AveragePassedTestsChart data={filteredAveragePassedTests} colorMap={colorMap}/>
+                        <AverageChangedTestsChart data={filteredAverageChangedTests} colorMap={colorMap} />
+                        <AverageFailedWorkflowExecutionTimeChart data={filteredAverageFailedWorkflowExecutionTime} colorMap={colorMap}/>
                     </div>
                     <div className="grid grid-cols-2 gap-10 flex-1 flex flex-col overflow-hidden">
                         <WorkflowFailureChart data={filteredWorkflowFailures}/>

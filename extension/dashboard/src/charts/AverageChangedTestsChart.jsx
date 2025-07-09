@@ -5,12 +5,13 @@ import {
     Bar,
     XAxis,
     YAxis,
+    Cell,
     CartesianGrid,
 } from 'recharts';
 
 import AverageChangedTestsTooltip from '../components/AverageChangedTestsTooltip.jsx';
-
-const AverageChangedTestsChart = ({ data }) => {
+import * as d3 from 'd3-scale-chromatic';
+const AverageChangedTestsChart = ({ data, colorMap }) => {
     if (!data || data.length === 0) {
         return (
             <div className="my-8 h-80 flex flex-col">
@@ -21,20 +22,55 @@ const AverageChangedTestsChart = ({ data }) => {
             </div>
         );
     }
-
     return (
         <div className="my-8 h-80 flex flex-col">
             <h3 className="text-xl font-semibold mb-4 text-left">Average changed lines per workflow</h3>
             <div className="chart-style flex-1">
                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data} layout="vertical" margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <BarChart data={data} margin={{ top: 20, right: 10 }}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis type="number" dataKey="average_churn" label={{ value: 'Average changed lines', position: 'insideBottomRight', offset: 0 }} height={40} />
-                        <YAxis type="category" dataKey="workflow_name" width={100} hide={true} />
+                        <XAxis
+                            dataKey="workflow_name"
+                            type="category"
+                            angle={-30}
+                            textAnchor="end"
+                            height={30}
+                            tick={false}
+                            axisLine={false}
+                        />
+                        <YAxis
+                            dataKey="average_churn"
+                            type="number"
+                            label={{
+                                value: 'Average changed lines',
+                                angle: -90,
+                                position: 'insideLeft', // ou 'insideRight'
+                                offset: 10
+                            }}
+                        />
                         <Tooltip content={<AverageChangedTestsTooltip />} />
-                        <Bar dataKey="average_churn" fill="#3b82f6" />
+                        <Bar
+                            dataKey="average_churn"
+                            //Pour les layout horizontal (Bar vertical)
+                            label={({ x, y, width, value }) => (
+                                <text
+                                    x={x + width / 2}
+                                    y={y - 7}
+                                    textAnchor="middle"
+                                    fill="#000"
+                                    fontSize={12}
+                                >
+                                    {value}
+                                </text>
+                            )}
+                        >
+                            {data.map((workflow) => (
+                                <Cell key={workflow['workflow_name']} fill={colorMap[workflow['workflow_name']]} />
+                            ))}
+                        </Bar>
                     </BarChart>
                 </ResponsiveContainer>
+
             </div>
         </div>
     );

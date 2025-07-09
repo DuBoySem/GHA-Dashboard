@@ -1,5 +1,6 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {useStore} from '../store/useStore.js';
+import React from "react";
 
 function HomePage() {
     const saveToken = useStore((state) => state.setToken);
@@ -9,6 +10,16 @@ function HomePage() {
     const [errors, setErrors] = useState({});
     const isDisabled = !token.trim() || !repoUrl.trim();
 
+    //fill repoUrl input field with URL of cuurent repo
+    useEffect(() => {
+        const currentUrl = "https://github.com/apache/superset" //window.location.href;
+        const match = currentUrl.match(/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+/);
+
+        if (match) {
+            setRepoUrl(match[0]);
+        }
+    }, []);
+
     const handleTokenChange = (e) => {
         setToken(e.target.value);
 
@@ -17,13 +28,13 @@ function HomePage() {
         }
     };
 
-    const handleRepoChange = (e) => {
-        setRepoUrl(e.target.value);
-
-        if (errors.repo) {
-            setErrors((prev) => ({...prev, repo: undefined}));
-        }
-    };
+    // const handleRepoChange = (e) => {
+    //     setRepoUrl(e.target.value);
+    //
+    //     if (errors.repo) {
+    //         setErrors((prev) => ({...prev, repo: undefined}));
+    //     }
+    // };
 
     const checkGithubToken = async () => {
         try {
@@ -68,40 +79,39 @@ function HomePage() {
 
             return;
         }
-        
+
         saveToken(token);
         saveRepoUrl(repoUrl);
     };
 
     return (
-        <div className={"min-h-screen bg-white py-20"}>
+        <div className={"min-h-screen mx-auto max-w-1/2 bg-white py-20"}>
             <div className="flex flex-col mx-auto p-4">
-                <div className={" flex flex-col items-center mb-8 gap-2"}>
-                    <h1 className={"text-3xl font-semibold text-blue-600"}>Welcome to GHAminer Dashboard</h1>
-                    <p className={"max-w-md text-center text-black leading-6"}>To get started, enter your GitHub token
-                        and the repository URL for which you want to generate a dashboard.</p>
+                <div className={" flex flex-col items-center mb-5 gap-2"}>
+                    <h1 className={"text-3xl font-semibold text-black"}>Welcome to GHAminer Dashboard</h1>
+                    <p className={"max-w-md text-sm text-center text-black leading-6"}>To get started, enter your GitHub token to generate a dashboard for this GitHub repository.</p>
                 </div>
-                <form onSubmit={handleSubmit} className="w-1/3 mx-auto px-20 py-10 border border-blue-200 rounded-2xl">
+                <form onSubmit={handleSubmit} className="w-1/2 mx-auto px-10 py-6 border border-black rounded-2xl">
 
-                    <label className="block mb-4 mt-4">
-                        GitHub repository :
-                        <input
-                            type="text"
-                            placeholder="https://github.com/user/repo"
-                            value={repoUrl}
-                            onChange={handleRepoChange}
-                            className="w-full border rounded p-2 mt-1"
-                        />
-                        {errors.repo && <p className="text-red-500">{errors.repo}</p>}
-                    </label>
-                    <label className="block mb-2">
+                    {/*<label className="block mb-4 mt-4 text-blue-600">*/}
+                    {/*    GitHub repository :*/}
+                    {/*    <input*/}
+                    {/*        type="text"*/}
+                    {/*        placeholder="https://github.com/user/repo"*/}
+                    {/*        value={repoUrl}*/}
+                    {/*        onChange={handleRepoChange}*/}
+                    {/*        className="w-full border rounded p-2 mt-1 text-black"*/}
+                    {/*    />*/}
+                    {/*    {errors.repo && <p className="text-red-500">{errors.repo}</p>}*/}
+                    {/*</label>*/}
+                    <label className="block mb-2 text-black">
                         GitHub token :
                         <input
                             type="password"
                             placeholder="github_pat_…"
                             value={token}
                             onChange={handleTokenChange}
-                            className="w-full border rounded p-2 mt-1"
+                            className="w-full border rounded p-2 mt-1 text-black"
                         />
                         {errors.token && <p className="text-red-500">{errors.token}</p>}
                     </label>
@@ -110,7 +120,7 @@ function HomePage() {
                         type="submit"
                         disabled={isDisabled}
                         className={`px-4 py-2 rounded w-full mt-5 ${
-                            isDisabled ? 'bg-gray-200 cursor-not-allowed text-gray-400' : 'bg-blue-600 text-white cursor-pointer hover:bg-blue-700'
+                            isDisabled ? 'bg-gray-200 cursor-not-allowed text-gray-400' : 'bg-black text-white cursor-pointer hover:bg-gray-800'
                         }`}
                     >
                         Generate dashboard

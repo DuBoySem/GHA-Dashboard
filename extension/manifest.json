@@ -14,12 +14,13 @@
   "content_scripts": [
     {
       "matches": ["https://github.com/*"],
-      "js": ["content.js"]
+      "js": ["content.js"],
+      "css": ["bundle.css"]
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["bundle.js"],
+      "resources": ["bundle.js", "bundle.css"],
       "matches": ["<all_urls>"]
     }
   ]

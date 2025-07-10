@@ -193,7 +193,7 @@ const DashboardPage = () => {
                         <AverageFailedWorkflowExecutionTimeChart data={filteredAverageFailedWorkflowExecutionTime} colorMap={colorMap}/>
                     </div>
                     <div className="grid grid-cols-2 gap-10 flex-1 flex flex-col overflow-hidden">
-                        <WorkflowFailureChart data={filteredWorkflowFailures}/>
+                        <WorkflowFailureChart data={filteredWorkflowFailures} colorMap={colorMap}/>
                         <IssuerFailureTable data={kpis.AverageFaillureRatePerIssuer}/>
                     </div>
                 </div>

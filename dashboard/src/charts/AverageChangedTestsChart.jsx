@@ -10,11 +10,9 @@ import {
 } from 'recharts';
 
 import AverageChangedTestsTooltip from '../components/AverageChangedTestsTooltip.jsx';
-import * as d3 from 'd3-scale-chromatic';
-const AverageChangedTestsChart = ({ data, colorMap }) => {
-    console.log(data);
-    console.log(colorMap);
+import {formatNumber} from "../utils/formatNumber";
 
+const AverageChangedTestsChart = ({ data, colorMap }) => {
     if (!data || data.length === 0) {
         return (
             <div className="my-8 h-80 flex flex-col">
@@ -44,10 +42,18 @@ const AverageChangedTestsChart = ({ data, colorMap }) => {
                         <YAxis
                             dataKey="average_churn"
                             type="number"
+                            tickFormatter={(value) => formatNumber(value)}
+                            label={{
+                                value: 'Average changed lines',
+                                angle: -90,
+                                position: 'insideLeft', // ou 'insideRight'
+                                offset: 10
+                            }}
                         />
                         <Tooltip content={<AverageChangedTestsTooltip />} />
                         <Bar
                             dataKey="average_churn"
+                            //Pour les layout horizontal (Bar vertical)
                             label={({ x, y, width, value }) => (
                                 <text
                                     x={x + width / 2}
@@ -56,7 +62,7 @@ const AverageChangedTestsChart = ({ data, colorMap }) => {
                                     fill="#000"
                                     fontSize={12}
                                 >
-                                    {value}
+                                    {formatNumber(value)}
                                 </text>
                             )}
                         >

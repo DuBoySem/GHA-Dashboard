@@ -16,7 +16,7 @@ const SideMenu = ({ workflows, selectedWorkflows, onWorkflowToggle, colorsMap })
                         />
                     ))
                 ) : (
-                    <li className="text-gray-500 text-sm">Aucun workflow disponible.</li>
+                    <li className="text-gray-500 text-sm">No workflows available.</li>
                 )}
             </ul>
         </div>

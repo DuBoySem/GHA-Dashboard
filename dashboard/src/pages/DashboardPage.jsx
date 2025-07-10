@@ -169,31 +169,16 @@ const DashboardPage = () => {
             <div className="flex-1 p-8 bg-white flex flex-col overflow-hidden">
                 <div className="flex flex-row items-baseline justify-center gap-2">
                     <h2 className="text-5xl text-black font-weight-bold mb-6 mr-auto">{repoName}</h2>
-                    {/*<form onSubmit={handleSubmit} className="flex gap-2">*/}
-                    {/*    <input*/}
-                    {/*        type="text"*/}
-                    {/*        value={repoUrl}*/}
-                    {/*        onChange={(e) => setRepoUrl(e.target.value)}*/}
-                    {/*        placeholder="https://github.com/user/repo"*/}
-                    {/*        className="border border-gray-300 px-4 py-2 rounded w-96"*/}
-                    {/*    />*/}
-                    {/*    <button*/}
-                    {/*        type="submit"*/}
-                    {/*        className="cursor-pointer bg-black text-white px-4 py-2 rounded hover:bg-blue-700"*/}
-                    {/*    >*/}
-                    {/*        Analyse GitHub repo*/}
-                    {/*    </button>*/}
-                    {/*</form>*/}
                 </div>
                 <div className="divide-y divide-gray-200 flex-1 flex flex-col overflow-hidden">
                     <div className="grid grid-cols-4 gap-10 mb-3">
                         <WorkflowStddevChart data={filteredWorkflowStddev} colorMap={colorMap}/>
-                        <AveragePassedTestsChart data={filteredAveragePassedTests}/>
+                        <AveragePassedTestsChart data={filteredAveragePassedTests} colorMap={colorMap}/>
                         <AverageChangedTestsChart data={filteredAverageChangedTests} colorMap={colorMap}/>
-                        <AverageFailedWorkflowExecutionTimeChart data={filteredAverageFailedWorkflowExecutionTime}/>
+                        <AverageFailedWorkflowExecutionTimeChart data={filteredAverageFailedWorkflowExecutionTime} colorMap={colorMap}/>
                     </div>
                     <div className="grid grid-cols-2 gap-10 flex-1 flex flex-col overflow-hidden">
-                        <WorkflowFailureChart data={filteredWorkflowFailures}/>
+                        <WorkflowFailureChart data={filteredWorkflowFailures} colorMap={colorMap}/>
                         <IssuerFailureTable data={kpis.AverageFaillureRatePerIssuer}/>
                     </div>
                 </div>

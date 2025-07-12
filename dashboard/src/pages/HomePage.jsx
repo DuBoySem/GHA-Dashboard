@@ -12,7 +12,7 @@ function HomePage() {
 
     //fill repoUrl input field with URL of cuurent repo
     useEffect(() => {
-        const currentUrl = "https://github.com/apache/superset" //window.location.href;
+        const currentUrl = "https://github.com/sqlalchemy/sqlalchemy" //window.location.href;
         const match = currentUrl.match(/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+/);
 
         if (match) {

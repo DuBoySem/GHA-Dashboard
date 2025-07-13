@@ -1,3 +1,4 @@
+import React from "react";
 
 export const IssuerFailureTable = ({ data }) => {
     const sortedData = data 

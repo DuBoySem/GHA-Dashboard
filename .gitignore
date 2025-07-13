@@ -4,6 +4,7 @@
 
 dashboard/node_modules/
 extension/node_modules/
+extension/dist/
 dashboard/dist/
 dashboard/.cache/
 dashboard/.DS_Store

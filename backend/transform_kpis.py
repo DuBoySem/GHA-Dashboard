@@ -166,7 +166,7 @@ def compute_kpis(raw_dict):
     for wf_name, stats in grouped_workflows.items():
         # removes 10 first executions from total to have accurate values and metrics
         if stats["total"] > 10:
-            stats["total"]-=10;
+            stats["total"]-=10
         # create line of data for failure rate per wf
         fail_rate = round(stats["fail"] / stats["total"], 2)
         wf_fail_rate.append(AverageFaillureRatePerWorkflow(workflow_name=wf_name, faillure_rate=fail_rate))

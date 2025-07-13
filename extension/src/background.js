@@ -92,3 +92,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+//to prevent timeout stop
+//alarm each 6 seconds
+chrome.alarms.create('keepalive', { periodInMinutes: 0.1 }); 
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'keepalive') {
+    console.log("Keepalive ping");
+    if (runningSSE && !eventSource){
+      startSSE();
+    }
+  }
+});

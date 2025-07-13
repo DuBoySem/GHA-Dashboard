@@ -137,7 +137,8 @@ def compute_kpis(raw_dict):
                     grouped_workflows[workflow]["sum_test_passed_rate"] += pass_rate
                 # prevent edge case of dividing by 0
             # test churn
-            grouped_workflows[workflow]["sum_test_change"] += int(row["gh_test_churn"])
+            if row["gh_test_churn"]:
+                grouped_workflows[workflow]["sum_test_change"] += int(row["gh_test_churn"])
 
             # for issuers
             # get issuer name

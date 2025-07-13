@@ -6,6 +6,8 @@ import sys
 import threading
 from datetime import datetime, timedelta
 from pathlib import Path
+import re
+import yaml
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 GHAMINER_PATH = BASE_DIR / "ghaminer"
@@ -34,6 +36,7 @@ def clone_or_update_ghaminer():
         stdout=subprocess.DEVNULL,
         stderr=subprocess.STDOUT,
     )
+    patch_gha()
     return
 
 
@@ -96,6 +99,66 @@ def run_gha_async(repo_url, token):
         ],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
+        #!!uncomment to debug GHAMiner
+        #!! might not work on windows
+        # stdout=subprocess.PIPE,
+        # stderr=subprocess.PIPE,
+        # text=True,
     )
     # start the thread
     threading.Thread(target=gha_monitor, args=(process,)).start()
+
+
+# code to change ghaminer's coding automatically
+def patch_gha():
+    base = Path(__file__).resolve().parent
+    # path of files to change
+    py_path = (base / "../ghaminer/src/GHAMetrics.py").resolve()
+    yaml_path = (base / "../ghaminer/src/config.yaml").resolve()
+    # new python code
+    py_code = """
+def load_config(config_file='config.yaml'):
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    config_path = os.path.join(script_dir, config_file)
+    try:
+        with open(config_path, 'r') as file:
+            config = yaml.safe_load(file)
+        return config
+    except Exception as e:
+        logging.error(f"Failed to load config file {config_path}: {e}")
+        return {}
+    """
+    # new yaml config
+    yaml_config = {
+        'fetch_job_details': True,
+        'fetch_test_parsing_results': True,
+        'fetch_commit_details': True,
+        'fetch_pull_request_details': True,
+        'fetch_sloc': True
+    }
+
+    # ------change python code
+    with open(py_path,'r') as py_file:
+        py_content=py_file.read();
+
+    pattern = r'def\s+load_config\s*\([^)]*\):(?:\n\s+.+)+'
+    py_content = re.sub(pattern,py_code,py_content)
+    with open(py_path,'w') as py_file:
+        py_file.write(py_content)
+    
+    print("[GHA Runner]: changed 'load_config' function in GHAMetrics")
+    #-------
+    # --- change yaml config
+    with open(yaml_path, 'r') as y_file:
+        yaml_content = yaml.safe_load(y_file)
+
+    # Apply the updates
+    for key, value in yaml_config.items():
+        yaml_content[key] = value
+
+    with open(yaml_path, 'w') as y_file:
+        yaml.safe_dump(yaml_content, y_file)
+
+    print("[GHA Runner]: changed config values in ghaminer")
+
+

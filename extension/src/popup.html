@@ -1,0 +1,49 @@
+<html>
+
+<head>
+  <title>Conrtol Panel</title>
+  <style>
+    body {
+      width: 250px;
+      padding: 16px;
+      font-family: sans-serif;
+      background-color: #f9f9f9;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #sse-state {
+      width: 100%;
+      height: 20px;
+      border-radius: 4px;
+      text-align: center;
+      font-weight: bold;
+      color: white;
+      padding: 4px 0;
+    }
+
+    .running {
+      background-color: #28a745;
+    }
+
+    .stopped {
+      background-color: #dc3545;
+    }
+  </style>
+</head>
+
+<body>
+  <h2 style="text-align: center;">Control Panel</h2>
+  <button id="startBtn">Start SSE</button>
+  <button id="stopBtn">Stop SSE</button>
+  <div id="sse-state" class="stopped">...</div>
+  <script src="popup.js"></script>
+</body>
+
+</html>

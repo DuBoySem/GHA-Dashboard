@@ -11,8 +11,6 @@ numpy = "*"
 pandas = "*"
 fastapi = "*"
 uvicorn = "*"
-celery = "*"
-redis = "*"
 
 [dev-packages]
 pytest = "*"
@@ -20,8 +18,3 @@ pre-commit = "*"
 
 [requires]
 python_version = "3.11"
-
-[scripts]
-backend = "uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000"
-worker = "celery -A backend.celery_worker worker --loglevel=info"
-redis = "docker run --rm -p 6379:6379 redis"

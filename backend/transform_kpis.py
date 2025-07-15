@@ -1,3 +1,4 @@
+import traceback
 import csv
 import json
 import os
@@ -79,6 +80,8 @@ def write_json(kpis_path, kpis_dict):
 
 # reads row data from csv and parse it
 def parse_raw_data(raw_data_path, raw_dict):
+    #resets raw_dict variable
+    raw_dict.clear()
     # open the csv file that contains the row data
     with open(raw_data_path, mode="r", newline="", encoding="utf-8") as csv_content:
         # reads the content
@@ -128,13 +131,14 @@ def compute_kpis(raw_dict):
                 if (int(row["tests_total"]) - int(row["tests_skipped"])) > 0:
                     grouped_workflows[workflow]["total_times_tests_ran_passed"] += 1
                     # passed tests rate
-                    pass_rate = (row["tests_passed"]) / (
-                        row["tests_total"] - row["tests_skipped"]
+                    pass_rate = (float(row["tests_passed"])) / (
+                        float(row["tests_total"]) - float(row["tests_skipped"])
                     )
-                    grouped_workflows[workflow]["sum_tests_passed_rate"] += pass_rate
+                    grouped_workflows[workflow]["sum_test_passed_rate"] += pass_rate
                 # prevent edge case of dividing by 0
             # test churn
-            grouped_workflows[workflow]["sum_test_change"] += int(row["gh_test_churn"])
+            if row["gh_test_churn"]:
+                grouped_workflows[workflow]["sum_test_change"] += int(row["gh_test_churn"])
 
             # for issuers
             # get issuer name
@@ -162,7 +166,7 @@ def compute_kpis(raw_dict):
     for wf_name, stats in grouped_workflows.items():
         # removes 10 first executions from total to have accurate values and metrics
         if stats["total"] > 10:
-            stats["total"]-=10;
+            stats["total"]-=10
         # create line of data for failure rate per wf
         fail_rate = round(stats["fail"] / stats["total"], 2)
         wf_fail_rate.append(AverageFaillureRatePerWorkflow(workflow_name=wf_name, faillure_rate=fail_rate))
@@ -195,7 +199,7 @@ def compute_kpis(raw_dict):
         if stats["total_times_tests_ran_passed"] > 0:
             avg_passed_tests = (stats["sum_test_passed_rate"] / stats["total_times_tests_ran_passed"])
             wf_tests_passed.append(
-                AveragePassedTestsPerWorkflowExcecution(workflow_name=wf_name, average_success=avg_passed_tests)
+                AveragePassedTestsPerWorkflowExcecution(workflow_name=wf_name, average_success_rate=avg_passed_tests)
             )
 
     for iss_name, stats in grouped_issuers.items():
@@ -238,6 +242,7 @@ def compute(csv_path_read:str,json_path_write:str):
         return kpis_dict
     except Exception as e:
         print("[KPI transformer] error: ", e)
+        traceback.print_exc()
 
 
 if __name__ == "__main__":

@@ -12,9 +12,8 @@ function HomePage() {
 
     //fill repoUrl input field with URL of cuurent repo
     useEffect(() => {
-        const currentUrl = "https://github.com/sqlalchemy/sqlalchemy" //window.location.href;
+        const currentUrl = window.location.href;
         const match = currentUrl.match(/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+/);
-
         if (match) {
             setRepoUrl(match[0]);
         }
@@ -28,13 +27,6 @@ function HomePage() {
         }
     };
 
-    // const handleRepoChange = (e) => {
-    //     setRepoUrl(e.target.value);
-    //
-    //     if (errors.repo) {
-    //         setErrors((prev) => ({...prev, repo: undefined}));
-    //     }
-    // };
 
     const checkGithubToken = async () => {
         try {
@@ -93,17 +85,6 @@ function HomePage() {
                 </div>
                 <form onSubmit={handleSubmit} className="w-1/2 mx-auto px-10 py-6 border border-black rounded-2xl">
 
-                    {/*<label className="block mb-4 mt-4 text-blue-600">*/}
-                    {/*    GitHub repository :*/}
-                    {/*    <input*/}
-                    {/*        type="text"*/}
-                    {/*        placeholder="https://github.com/user/repo"*/}
-                    {/*        value={repoUrl}*/}
-                    {/*        onChange={handleRepoChange}*/}
-                    {/*        className="w-full border rounded p-2 mt-1 text-black"*/}
-                    {/*    />*/}
-                    {/*    {errors.repo && <p className="text-red-500">{errors.repo}</p>}*/}
-                    {/*</label>*/}
                     <label className="block mb-2 text-black">
                         GitHub token :
                         <input

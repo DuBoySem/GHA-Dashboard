@@ -110,3 +110,23 @@ The data pipeline is designed to support future machine learning use cases, such
 ## License
 
 This project is released under the **MIT License**. See the `LICENSE` file for details.
+
+# Privacy Policy  
+
+GHA-Dashboard is an open-source Chrome extension that helps GitHub users analyze their GitHub Actions workflow performance through a visual dashboard injected directly into the GitHub UI.  
+
+## What the Extension Does  
+- Displays a metrics dashboard directly on GitHub repository pages.  
+- Optionally connects to the GHAMiner tool running on your local machine to fetch precomputed workflow metrics.
+
+## What the Extension Does Not Do  
+- It does not collect or store any personal data.
+- It does not track your browsing or activity.
+- It does not send any data to external servers.
+- It does not access your GitHub credentials or private repositories.
+
+## Your Data, Your Control  
+All metrics and data used by the extension stay on your local machine. If you use GHAMiner, it processes public GitHub repository data locally — you remain the sole owner of that data.  
+
+## Open Source Transparency  
+This project is fully open-source. You’re welcome to explore the code, suggest improvements, or contribute.

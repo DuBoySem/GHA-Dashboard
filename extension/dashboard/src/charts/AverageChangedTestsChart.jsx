@@ -43,12 +43,6 @@ const AverageChangedTestsChart = ({ data, colorMap }) => {
                             dataKey="average_churn"
                             type="number"
                             tickFormatter={(value) => formatNumber(value)}
-                            label={{
-                                value: 'Average changed lines',
-                                angle: -90,
-                                position: 'insideLeft', // ou 'insideRight'
-                                offset: 10
-                            }}
                         />
                         <Tooltip content={<AverageChangedTestsTooltip />} />
                         <Bar

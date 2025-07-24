@@ -17,7 +17,7 @@ const SideMenuItem = ({ workflowName, isSelected, onClick, color }) => {
                 type="checkbox"
                 checked={isSelected}
                 readOnly
-                className="mr-2 accent-black"
+                className="mr-2 border-gray-300 bg-transparent accent-black"
                 tabIndex={-1}
             />
             {workflowName}

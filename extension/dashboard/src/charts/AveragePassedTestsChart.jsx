@@ -31,7 +31,7 @@ const AveragePassedTestsChart = ({data, colorMap}) => {
                     <BarChart data={data} layout="vertical" margin={{top: 20, right: 30, left: 20, bottom: 5}}>
                         <CartesianGrid strokeDasharray="3 3"/>
                         <XAxis type="number" dataKey="average_success_rate"
-                               label={{value: 'Average passed tests', position: 'insideBottomRight', offset: 0}}
+                            //    label={{value: 'Average passed tests', position: 'insideBottomRight', offset: 0}}
                                height={40}
                                tickFormatter={(value) => formatNumber(value)}
                         />

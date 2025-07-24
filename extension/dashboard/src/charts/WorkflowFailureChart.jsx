@@ -17,7 +17,7 @@ const WorkflowFailureChart = ({ data, colorMap }) => {
         return (
             <div className="flex-1 flex flex-col">
                 <h3 className="text-xl font-semibold mb-4 text-left">
-                    Workflows by failure rate(%)
+                    Workflows by failure rate (%)
                 </h3>
                 <div className="chart-style flex-1 flex items-center justify-center">
                     <p className="text-gray-500 text-center py-4">
@@ -31,7 +31,7 @@ const WorkflowFailureChart = ({ data, colorMap }) => {
     return (
         <div className="flex-1 flex flex-col overflow-hidden">
             <h3 className="text-xl font-semibold mb-4 text-left">
-                Workflows by failure rate(%)
+                Workflows by failure rate (%)
             </h3>
             <div className="chart-style flex-1 overflow-hidden">
                 <ResponsiveContainer width="100%" height="100%">

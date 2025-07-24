@@ -27,3 +27,10 @@ function updateStatus(isRunning){
     sseState.classList.add("stopped");
   }
 }
+
+// for getting the SSE state on popup display/load
+chrome.runtime.sendMessage({ action: "GET_SSE_STATUS" }, (response) => {
+  if (response && typeof response.isRunning === "boolean") {
+    updateStatus(response.isRunning);
+  }
+});

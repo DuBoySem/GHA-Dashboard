@@ -1,5 +1,5 @@
 import {BarChart, Bar, XAxis, YAxis, Tooltip, Cell, ResponsiveContainer, CartesianGrid} from 'recharts'
-import StddevTooltip from '../components/StddevTooltip.jsx'
+import StddevTooltip from '../components/tooltips/StddevTooltip.jsx'
 import * as d3 from "d3-scale-chromatic";
 import {formatNumber} from "../utils/formatNumber";
 

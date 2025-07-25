@@ -8,7 +8,7 @@ import {
     CartesianGrid, Cell,
 } from 'recharts';
 
-import AverageFailedWorkflowExecutionTimeTooltip from '../components/AverageFailedWorkflowExecutionTimeTooltip.jsx';
+import AverageFailedWorkflowExecutionTimeTooltip from '../components/tooltips/AverageFailedWorkflowExecutionTimeTooltip.jsx';
 import {formatNumber} from "../utils/formatNumber";
 
 const AverageFailedWorkflowExecutionTimeChart = ({data, colorMap}) => {

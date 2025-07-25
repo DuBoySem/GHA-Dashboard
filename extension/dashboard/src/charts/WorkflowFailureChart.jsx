@@ -8,7 +8,7 @@ import {
     CartesianGrid, Cell
 } from 'recharts'
 
-import FailureTooltip from '../components/FailureTooltip.jsx';
+import FailureTooltip from '../components/tooltips/FailureTooltip.jsx';
 import {formatNumber} from "../utils/formatNumber.js";
 
 const WorkflowFailureChart = ({data, colorMap}) => {

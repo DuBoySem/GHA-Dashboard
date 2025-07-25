@@ -9,7 +9,7 @@ import {
     CartesianGrid,
 } from 'recharts';
 
-import AverageChangedTestsTooltip from '../components/AverageChangedTestsTooltip.jsx';
+import AverageChangedTestsTooltip from '../components/tooltips/AverageChangedTestsTooltip.jsx';
 import {formatNumber} from "../utils/formatNumber";
 
 const AverageChangedTestsChart = ({ data, colorMap }) => {
@@ -28,37 +28,33 @@ const AverageChangedTestsChart = ({ data, colorMap }) => {
             <h3 className="text-xl font-semibold mb-4 text-left">Average changed lines per workflow</h3>
             <div className="chart-style flex-1">
                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data} margin={{ top: 20, right: 10 }}>
+                    <BarChart data={data} layout="vertical" margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis
-                            dataKey="workflow_name"
-                            type="category"
-                            angle={-30}
-                            textAnchor="end"
-                            height={30}
-                            tick={false}
-                            axisLine={false}
-                        />
-                        <YAxis
                             dataKey="average_churn"
                             type="number"
                             tickFormatter={(value) => formatNumber(value)}
                             label={{
                                 value: 'Average changed lines',
-                                angle: -90,
-                                position: 'insideLeft', // ou 'insideRight'
-                                offset: 10
+                                position: 'insideBottomRight',
+                                offset: 0
                             }}
+                            height={40}
+                        />
+                        <YAxis
+                            dataKey="workflow_name"
+                            type="category"
+                            width={100}
+                            hide={true}
                         />
                         <Tooltip content={<AverageChangedTestsTooltip />} />
                         <Bar
                             dataKey="average_churn"
-                            //Pour les layout horizontal (Bar vertical)
-                            label={({ x, y, width, value }) => (
+                            label={({ x, y, width, height, value }) => (
                                 <text
-                                    x={x + width / 2}
-                                    y={y - 7}
-                                    textAnchor="middle"
+                                    x={x + width + 5}
+                                    y={y + height / 2}
+                                    dy={4}
                                     fill="#000"
                                     fontSize={12}
                                 >
@@ -72,7 +68,6 @@ const AverageChangedTestsChart = ({ data, colorMap }) => {
                         </Bar>
                     </BarChart>
                 </ResponsiveContainer>
-
             </div>
         </div>
     );

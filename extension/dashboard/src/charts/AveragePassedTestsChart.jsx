@@ -8,7 +8,7 @@ import {
     CartesianGrid, Cell,
 } from 'recharts';
 
-import AveragePassedTestsTooltip from '../components/AveragePassedTestsTooltip.jsx';
+import AveragePassedTestsTooltip from '../components/tooltips/AveragePassedTestsTooltip.jsx';
 import {formatNumber} from "../utils/formatNumber";
 
 const AveragePassedTestsChart = ({data, colorMap}) => {

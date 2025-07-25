@@ -35,15 +35,14 @@ const AverageFailedWorkflowExecutionTimeChart = ({data, colorMap}) => {
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data} layout="vertical" margin={{top: 20, right: 30, left: 20, bottom: 5}}>
                         <CartesianGrid strokeDasharray="3 3"/>
-                        <XAxis type="number" dataKey="average_duration"
+                        <XAxis type="number" dataKey="fail_mad"
                                label={{value: 'Average duration (s)', position: 'insideBottomRight', offset: 0}}
                                height={40}
                                tickFormatter={(value) => formatNumber(value)}
                         />
                         <YAxis type="category" dataKey="workflow_name" width={100} hide={true}/>
                         <Tooltip content={<AverageFailedWorkflowExecutionTimeTooltip/>}/>
-                        <Bar dataKey="average_duration"
-                            //Pour les layout vertical (Bar horizontal)
+                        <Bar dataKey="fail_mad"
                              label={({x, y, width, height, value}) => (
                                  <text
                                      x={x + width + 5}

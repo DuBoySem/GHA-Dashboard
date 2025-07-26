@@ -7,25 +7,31 @@ import {
     YAxis,
     Cell,
     CartesianGrid,
-} from 'recharts';
+} from "recharts";
 
-import AverageChangedTestsTooltip from '../components/AverageChangedTestsTooltip.jsx';
-import {formatNumber} from "../utils/formatNumber";
+import AverageChangedTestsTooltip from "../components/AverageChangedTestsTooltip.jsx";
+import { formatNumber } from "../utils/formatNumber";
 
 const AverageChangedTestsChart = ({ data, colorMap }) => {
     if (!data || data.length === 0) {
         return (
             <div className="my-8 h-80 flex flex-col">
-                <h3 className="text-xl font-semibold mb-4 text-left">Average changed lines per workflow</h3>
+                <h3 className="text-xl font-semibold mb-4 text-left">
+                    Average changed lines per workflow
+                </h3>
                 <div className="chart-style flex-1 flex items-center justify-center">
-                    <p className="text-gray-500 text-center py-12">No data available</p>
+                    <p className="text-gray-500 text-center py-12">
+                        No data available
+                    </p>
                 </div>
             </div>
         );
     }
     return (
         <div className="my-8 h-80 flex flex-col">
-            <h3 className="text-xl font-semibold mb-4 text-left">Average changed lines per workflow</h3>
+            <h3 className="text-xl font-semibold mb-4 text-left">
+                Average changed lines per workflow
+            </h3>
             <div className="chart-style flex-1">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data} margin={{ top: 20, right: 10 }}>
@@ -43,12 +49,6 @@ const AverageChangedTestsChart = ({ data, colorMap }) => {
                             dataKey="average_churn"
                             type="number"
                             tickFormatter={(value) => formatNumber(value)}
-                            label={{
-                                value: 'Average changed lines',
-                                angle: -90,
-                                position: 'insideLeft', // ou 'insideRight'
-                                offset: 10
-                            }}
                         />
                         <Tooltip content={<AverageChangedTestsTooltip />} />
                         <Bar
@@ -67,12 +67,14 @@ const AverageChangedTestsChart = ({ data, colorMap }) => {
                             )}
                         >
                             {data.map((workflow) => (
-                                <Cell key={workflow['workflow_name']} fill={colorMap[workflow['workflow_name']]} />
+                                <Cell
+                                    key={workflow["workflow_name"]}
+                                    fill={colorMap[workflow["workflow_name"]]}
+                                />
                             ))}
                         </Bar>
                     </BarChart>
                 </ResponsiveContainer>
-
             </div>
         </div>
     );

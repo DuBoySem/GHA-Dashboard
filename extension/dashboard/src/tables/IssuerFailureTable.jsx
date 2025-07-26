@@ -11,19 +11,42 @@ export const IssuerFailureTable = ({ data }) => {
     const rowsPerPage = 10;
     const [page, setPage] = useState(1);
 
+    // Ajout dynamique du champ failed_runs
+    const dataWithFailedRuns = (data || []).map((row) => ({
+        ...row,
+        failed_runs:
+            row.faillure_rate !== undefined &&
+            (row.total_runs !== undefined || row.execution_number !== undefined)
+                ? Math.round(
+                      row.faillure_rate *
+                          (row.total_runs !== undefined
+                              ? row.total_runs
+                              : row.execution_number)
+                  )
+                : 0,
+    }));
+
     // Filtrage par recherche
     const filteredData =
-        data && data.length > 0
-            ? data.filter((row) =>
+        dataWithFailedRuns.length > 0
+            ? dataWithFailedRuns.filter((row) =>
                   row.issuer_name.toLowerCase().includes(search.toLowerCase())
               )
             : [];
 
-    // Tri
+    // Tri (ajout du tri sur failed_runs)
     const sortedData = filteredData.slice().sort((a, b) => {
         const { key, direction } = sortConfig;
         let aValue = a[key];
         let bValue = b[key];
+        if (
+            key === "total_runs" ||
+            key === "execution_number" ||
+            key === "failed_runs"
+        ) {
+            aValue = Number(aValue);
+            bValue = Number(bValue);
+        }
         if (typeof aValue === "string") aValue = aValue.toLowerCase();
         if (typeof bValue === "string") bValue = bValue.toLowerCase();
         if (aValue < bValue) return direction === "asc" ? -1 : 1;
@@ -115,10 +138,29 @@ export const IssuerFailureTable = ({ data }) => {
                                 <div className="flex items-center gap-1">
                                     Total runs
                                     <button
-                                        onClick={() => handleSort("total_runs")}
+                                        onClick={() =>
+                                            handleSort("execution_number")
+                                        }
                                         className="ml-1 text-xs px-1 py-0.5 rounded border border-gray-300 bg-white hover:bg-gray-200"
                                     >
-                                        {sortConfig.key === "total_runs"
+                                        {sortConfig.key === "execution_number"
+                                            ? sortConfig.direction === "asc"
+                                                ? "▲"
+                                                : "▼"
+                                            : "⇅"}
+                                    </button>
+                                </div>
+                            </th>
+                            <th className="px-4 py-2 text-left">
+                                <div className="flex items-center gap-1">
+                                    Failed runs
+                                    <button
+                                        onClick={() =>
+                                            handleSort("failed_runs")
+                                        }
+                                        className="ml-1 text-xs px-1 py-0.5 rounded border border-gray-300 bg-white hover:bg-gray-200"
+                                    >
+                                        {sortConfig.key === "failed_runs"
                                             ? sortConfig.direction === "asc"
                                                 ? "▲"
                                                 : "▼"
@@ -143,19 +185,22 @@ export const IssuerFailureTable = ({ data }) => {
                                         {row.issuer_name}
                                     </td>
                                     <td className="px-4 py-2 border-r border-gray-200">
-                                        {row.faillure_rate.toFixed(2)*100}
+                                        {(row.faillure_rate * 100).toFixed(2)}
                                     </td>
                                     <td className="px-4 py-2">
                                         {row.total_runs !== undefined
                                             ? row.total_runs
                                             : row.execution_number}
                                     </td>
+                                    <td className="px-4 py-2">
+                                        {row.failed_runs}
+                                    </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
                                 <td
-                                    colSpan="3"
+                                    colSpan="4"
                                     className="px-4 py-4 text-center text-gray-500"
                                 >
                                     No data available

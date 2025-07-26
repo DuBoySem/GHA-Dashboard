@@ -7,7 +7,7 @@ export const IssuerFailureTable = ({ data }) => {
     
     return (
         <div className="flex-1 overflow-hidden flex flex-col">
-            <h3 className="text-xl font-semibold mb-4">Contributors by failure rate</h3>
+            <h3 className="text-xl font-semibold h-20">Contributors by failure rate</h3>
             <div className="overflow-x-auto rounded-lg border border-gray-200 overflow-y-auto flex-1">
                 <table className="min-w-full table-auto">
                     <thead className="bg-gray-100 sticky top-0 z-10">

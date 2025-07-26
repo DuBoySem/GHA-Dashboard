@@ -9,6 +9,7 @@ import {useStore} from "../store/useStore.js";
 import SideMenu from "../components/menu/SideMenu.jsx";
 import * as d3 from "d3-scale-chromatic";
 import WorkflowFailureLineChart from "../charts/WorkflowFailureLineChart.jsx";
+import WorkflowStddevLineChart from "../charts/WorkflowStddevLineChart.jsx";
 
 const DashboardPage = () => {
     const token = useStore((state) => state.token)
@@ -103,6 +104,14 @@ const DashboardPage = () => {
         return kpis.AverageFaillureRatePerWorkflow.filter(wf => selectedWorkflows.includes(wf.workflow_name));
     }, [kpis.AverageFaillureRatePerWorkflow, selectedWorkflows]);
 
+    const filteredWorkflowMonthlyStdDevDuration = useMemo(() => {
+        if (!kpis.StdDevWorkflowExecutions) {
+            return [];
+        }
+
+        return kpis.StdDevWorkflowExecutions.filter(wf => selectedWorkflows.includes(wf.workflow_name));
+    }, [kpis.StdDevWorkflowExecutions, selectedWorkflows]);
+
     const filteredWorkflowStddev = useMemo(() => {
         if (!kpis.StdDevWorkflowExecutions) {
             return [];
@@ -144,8 +153,40 @@ const DashboardPage = () => {
     }, [kpis.AverageFailedWorkflowExecutionTime, selectedWorkflows]);
 
     const allWorkflowNames = useMemo(() => {
-        return kpis.AverageFaillureRatePerWorkflow ? kpis.AverageFaillureRatePerWorkflow.map(wf => wf.workflow_name) : [];
-    }, [kpis.AverageFaillureRatePerWorkflow]);
+        const namesFromFailureRate = kpis.AverageFaillureRatePerWorkflow
+            ? kpis.AverageFaillureRatePerWorkflow.map(wf => wf.workflow_name)
+            : [];
+    
+        const namesFromStdDev = kpis.StdDevWorkflowExecutions
+            ? kpis.StdDevWorkflowExecutions.map(wf => wf.workflow_name)
+            : [];
+        
+        const namesFromPassedTests = kpis.AveragePassedTestsPerWorkflowExcecution
+            ? kpis.AveragePassedTestsPerWorkflowExcecution.map(wf => wf.workflow_name)
+            : [];
+
+        const namesFromChangedTests = kpis.AverageChangedTestsPerWorkflowExecution
+            ? kpis.AverageChangedTestsPerWorkflowExecution.map(wf => wf.workflow_name)
+            : [];
+            
+        const namesFromFailedExecTime = kpis.AverageFailedWorkflowExecutionTime
+            ? kpis.AverageFailedWorkflowExecutionTime.map(wf => wf.workflow_name)
+            : [];
+
+        return Array.from(new Set([
+            ...namesFromFailureRate,
+            ...namesFromStdDev,
+            ...namesFromPassedTests,
+            ...namesFromChangedTests,
+            ...namesFromFailedExecTime
+        ]));
+    }, [
+        kpis.AverageFaillureRatePerWorkflow,
+        kpis.StdDevWorkflowExecutions,
+        kpis.AveragePassedTestsPerWorkflowExcecution,
+        kpis.AverageChangedTestsPerWorkflowExecution,
+        kpis.AverageFailedWorkflowExecutionTime
+    ]);
 
     const colorMap = useMemo(() => {
         return Object.fromEntries(
@@ -165,7 +206,7 @@ const DashboardPage = () => {
                 <div className="divide-y divide-gray-200 flex-1 flex flex-col">
                     <div className="grid grid-cols-3 gap-10 mb-3 flex-grow-[2]">
                         <WorkflowFailureLineChart data={filteredWorkflowMonthlyFailures} colorMap={colorMap} />
-                        <WorkflowFailureLineChart data={filteredWorkflowMonthlyFailures} colorMap={colorMap} />
+                        <WorkflowStddevLineChart data={filteredWorkflowMonthlyStdDevDuration} colorMap={colorMap} />
                         <WorkflowFailureLineChart data={filteredWorkflowMonthlyFailures} colorMap={colorMap} />
                     </div>
                     <div className="grid grid-cols-4 gap-10 mb-3 flex-grow">

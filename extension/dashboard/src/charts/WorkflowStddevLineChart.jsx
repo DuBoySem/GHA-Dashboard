@@ -5,21 +5,22 @@ import {
     Line,
     XAxis,
     YAxis,
-    CartesianGrid
+    CartesianGrid,
+    Legend
 } from 'recharts';
 
-import FailuresTooltip from '../components/tooltips/FailuresTooltip.jsx';
+import StddevTrendTooltip from '../components/tooltips/StddevTrendTooltip.jsx';
 import {formatNumber} from "../utils/formatNumber";
 import {transformTrendData} from "../utils/transformTrendData.js";
 import TrendComparison from '../components/TrendComparison.jsx';
 
-const WorkflowFailureLineChart = ({ data, colorMap }) => {
-    const { transformedData, workflowNames } = transformTrendData(data);
+const WorkflowStddevLineChart = ({ data, colorMap }) => {
+    const { transformedData, workflowNames } = transformTrendData(data, 'month_mad_trend');
 
     if (!transformedData || transformedData.length === 0) {
         return (
             <div className="my-8 h-120 flex flex-col">
-                <h3 className="text-xl font-semibold h-20 text-left">Failure per Workflow (Monthly Trend)</h3>
+                <h3 className="text-xl font-semibold h-20 text-left">Mean Absolute Deviation (MAD) per Workflow (Monthly Trend)</h3>
                 <div className="chart-style flex-1 flex items-center justify-center">
                     <p className="text-gray-500 text-center py-4">No data available</p>
                 </div>
@@ -29,13 +30,12 @@ const WorkflowFailureLineChart = ({ data, colorMap }) => {
 
     return (
         <div className="my-8 h-120 flex flex-col">
-            <h3 className="text-xl font-semibold h-20 text-left">Failure per Workflow (Monthly Trend)</h3>
+            <h3 className="text-xl font-semibold h-20 text-left">Mean Absolute Deviation (MAD) per Workflow (Monthly Trend)</h3>
 
             <TrendComparison
                 transformedData={transformedData}
                 workflowNames={workflowNames}
                 formatNumber={formatNumber}
-                isPercentage={true}
             />
 
             <div className="chart-style flex-1">
@@ -58,16 +58,15 @@ const WorkflowFailureLineChart = ({ data, colorMap }) => {
                             label={{ value: 'Month', position: 'insideBottomRight', offset: -25 }}
                         />
                         <YAxis
-                            tickFormatter={(value) => `${formatNumber(value * 100)}%`}
-                            domain={[0, 1]}
+                            tickFormatter={(value) => `${formatNumber(value)} s`}
                             label={{
-                                value: 'Failure Rate',
+                                value: 'MAD',
                                 angle: -90,
                                 position: 'insideLeft',
                                 offset: 0
                             }}
                         />
-                        <Tooltip content={<FailuresTooltip />} />
+                        <Tooltip content={<StddevTrendTooltip />} />
                         {workflowNames.map((name) => (
                             <Line
                                 key={name}
@@ -84,4 +83,4 @@ const WorkflowFailureLineChart = ({ data, colorMap }) => {
     );
 };
 
-export default WorkflowFailureLineChart;
+export default WorkflowStddevLineChart;

@@ -1,4 +1,4 @@
-export const transformTrendData = (data) => {
+export const transformTrendData = (data, trendKey = 'month_average_trend') => {
     if (!data || data.length === 0) {
         return { transformedData: [], workflowNames: [] };
     }
@@ -8,11 +8,13 @@ export const transformTrendData = (data) => {
 
     data.forEach(workflow => {
         const workflowName = workflow.workflow_name;
-        workflowDataMap[workflowName] = workflow.month_average_trend;
+        workflowDataMap[workflowName] = workflow[trendKey];
 
-        Object.keys(workflow.month_average_trend).forEach(month => {
-            allMonths.add(month);
-        });
+        if (workflow[trendKey]) {
+            Object.keys(workflow[trendKey]).forEach(month => {
+                allMonths.add(month);
+            });
+        }
     });
 
     const sortedMonths = Array.from(allMonths).sort();
@@ -22,7 +24,10 @@ export const transformTrendData = (data) => {
 
         data.forEach(workflow => {
             const workflowName = workflow.workflow_name;
-            monthEntry[workflowName] = workflowDataMap[workflowName][month] || null;
+            
+            monthEntry[workflowName] = workflowDataMap[workflowName]
+                ? workflowDataMap[workflowName][month] || null
+                : null;
         });
 
         return monthEntry;

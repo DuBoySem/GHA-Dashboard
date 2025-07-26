@@ -4,7 +4,7 @@ const TrendArrowDown = () => <svg xmlns="http://www.w3.org/2000/svg" className="
 
 const TrendStable = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-500 inline-block ml-2" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" /></svg>;
 
-const TrendComparison = ({ transformedData, workflowNames, formatNumber }) => {
+const TrendComparison = ({ transformedData, workflowNames, formatNumber, isPercentage = false }) => {
     let lastMonthAverage = 0;
     let currentMonthAverage = 0;
     let lastMonthLabel = '';
@@ -45,18 +45,26 @@ const TrendComparison = ({ transformedData, workflowNames, formatNumber }) => {
         trendIcon = <TrendStable />;
     }
 
+    const formatValue = (value) => {
+        if (isPercentage) {
+            return `${formatNumber(value * 100)}%`;
+        }
+
+        return formatNumber(value);
+    };
+
     return (
-        <div className="chart-style h-28 flex justify-around items-center my-4 p-4">
+        <div className="chart-style h-28 flex justify-around items-center mb-4 p-4">
             <div className="text-center">
                 <p className="text-sm text-gray-600">{`Average for ${lastMonthLabel}`}</p>
-                <p className="text-lg font-bold text-gray-800">{`${formatNumber(lastMonthAverage * 100)}%`}</p>
+                <p className="text-lg font-bold text-gray-800">{formatValue(lastMonthAverage)}</p>
             </div>
             <div className="flex items-center mx-4">
                 {trendIcon}
             </div>
             <div className="text-center">
                 <p className="text-sm text-gray-600">{`Average for ${currentMonthLabel}`}</p>
-                <p className="text-lg font-bold text-gray-800">{`${formatNumber(currentMonthAverage * 100)}%`}</p>
+                <p className="text-lg font-bold text-gray-800">{formatValue(currentMonthAverage)}</p>
             </div>
         </div>
     );

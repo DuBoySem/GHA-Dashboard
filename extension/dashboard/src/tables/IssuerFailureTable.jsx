@@ -3,7 +3,7 @@ export const IssuerFailureTable = ({ data }) => {
     const [search, setSearch] = useState("");
 
     const [sortConfig, setSortConfig] = useState({
-        key: "faillure_rate",
+        key: "failed_runs",
         direction: "desc",
     });
 

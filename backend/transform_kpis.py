@@ -63,6 +63,14 @@ class AverageChangedTestsPerWorkflowExecution:
     average_churn: float
 
 
+@dataclass
+class PullRequestTriggersTrend:
+    workflow_name: str
+    # to prevent each instance of class object to share the same dict
+    week_triggers_trend: dict = field(default_factory=dict)
+    month_triggers_trend: dict = field(default_factory=dict)
+
+
 #other
 @dataclass
 class AveragePassedTestsPerWorkflowExcecution:
@@ -114,6 +122,9 @@ def compute_kpis(raw_dict):
             "failed_durations": [],
             "trend_duration_timestamps": DefaultDict(lambda: DefaultDict(list)),
             "trend_failed_duration_timestamps": DefaultDict(lambda: DefaultDict(list)),
+            # can be used to get fail rate trends for pull request triggers not implemented yet
+            # "trend_triggers_timestamps": DefaultDict(lambda: DefaultDict(lambda:{"total":0})),
+            "trend_triggers_timestamps": DefaultDict(lambda: DefaultDict(int)),
             "sum_fail_time": 0,
             "total_times_tests_ran": 0,
             "total_times_tests_ran_passed": 0,
@@ -182,6 +193,23 @@ def compute_kpis(raw_dict):
             grouped_workflows[workflow]["trend_conclusion_timestamps"]["by_month"][month_key]["total"] +=1
             #trends by week
             grouped_workflows[workflow]["trend_conclusion_timestamps"]["by_week"][week_key]["total"] +=1
+            #---
+            #--- pull requets triggers
+            if row.get("workflow_event_trigger") == "pull_request":
+                #trends by month
+                # grouped_workflows[workflow]["trend_triggers_timestamps"]["by_month"][month_key]["total"] +=1
+                grouped_workflows[workflow]["trend_triggers_timestamps"]["by_month"][month_key] +=1
+                #trends by week
+                # grouped_workflows[workflow]["trend_triggers_timestamps"]["by_week"][week_key]["total"] +=1
+                grouped_workflows[workflow]["trend_triggers_timestamps"]["by_week"][week_key] +=1
+            else:
+                #trends by month
+                # grouped_workflows[workflow]["trend_triggers_timestamps"]["by_month"][month_key]["total"] +=0
+                grouped_workflows[workflow]["trend_triggers_timestamps"]["by_month"][month_key] +=0
+                #trends by week
+                # grouped_workflows[workflow]["trend_triggers_timestamps"]["by_week"][week_key]["total"] +=0
+                grouped_workflows[workflow]["trend_triggers_timestamps"]["by_week"][week_key] +=0
+            #---
             #-- trends end --
             # test section
             # checks if tests got ran this execution
@@ -210,6 +238,7 @@ def compute_kpis(raw_dict):
         last_created_at_per_workflow[workflow] = created_at
     #-----
     wf_fail_rate = []
+    wf_PR_triggers_trend = []
     issuer_fail_rate = []
     wf_stddev = []
     wf_fail_duration = []
@@ -217,13 +246,14 @@ def compute_kpis(raw_dict):
     wf_test_churn = []
 
     #---
-    generate_metrics(grouped_workflows, grouped_issuers, wf_fail_rate, issuer_fail_rate, wf_stddev, wf_fail_duration, wf_tests_passed, wf_test_churn)
+    generate_metrics(grouped_workflows, grouped_issuers, wf_fail_rate, wf_PR_triggers_trend, issuer_fail_rate, wf_stddev, wf_fail_duration, wf_tests_passed, wf_test_churn)
     #---
     # setting up structure
     kpis_json = {
         "AverageFaillureRatePerWorkflow": [asdict(ele) for ele in wf_fail_rate],
         "StdDevWorkflowExecutions": [asdict(ele) for ele in wf_stddev],
         "AverageFaillureRatePerIssuer": [asdict(ele) for ele in issuer_fail_rate],
+        "PullRequestTriggersTrend": [asdict(ele) for ele in wf_PR_triggers_trend],
         "AveragePassedTestsPerWorkflowExcecution": [
             asdict(ele) for ele in wf_tests_passed
         ],
@@ -234,7 +264,7 @@ def compute_kpis(raw_dict):
     }
     return kpis_json
 
-def generate_metrics(grouped_workflows, grouped_issuers, wf_fail_rate,issuer_fail_rate, wf_stddev, wf_fail_duration, wf_tests_passed, wf_test_churn):
+def generate_metrics(grouped_workflows, grouped_issuers, wf_fail_rate,wf_PR_triggers_trend, issuer_fail_rate, wf_stddev, wf_fail_duration, wf_tests_passed, wf_test_churn):
     for wf_name, stats in grouped_workflows.items():
         # removes 10 first executions from total to have accurate values and metrics
         if stats["total"] > 10:
@@ -246,20 +276,32 @@ def generate_metrics(grouped_workflows, grouped_issuers, wf_fail_rate,issuer_fai
         rate_month_trend = generate_average_fail_rate_trend(stats["trend_conclusion_timestamps"]["by_month"])
         # by week
         rate_week_trend = generate_average_fail_rate_trend(stats["trend_conclusion_timestamps"]["by_week"])
-        #-- trends failure rate end --
+        #--- trends failure rate end ---
         wf_fail_rate.append(AverageFaillureRatePerWorkflow(workflow_name=wf_name, faillure_rate=fail_rate,execution_number=stats["total"],week_average_trend=rate_week_trend, month_average_trend=rate_month_trend))
         # stddev & mad
         durations = stats["durations"]
         stddev = round(stdev(durations), 2) if len(durations) > 1 else 0.0
         median_durations = statistics.median(durations)
         mad = statistics.median([abs(x - median_durations) for x in durations]) if len(durations)>1 else 0
-        # -- trends
+        # --- trends mad duration ---
+        # by month
         monthly_trend = generate_mad_trend(stats["trend_duration_timestamps"]["by_month"])
+        # by week
         weekly_trend = generate_mad_trend(stats["trend_duration_timestamps"]["by_week"])
+        # -- trends mad duration end ---
         # create line of data for stddev of workdlows
         wf_stddev.append(
             StdDevOfWorkflowExecutions(workflow_name=wf_name, duration_stddev=stddev, duration_mad=mad,week_mad_trend=weekly_trend, month_mad_trend=monthly_trend)
         )
+        # ---pull request triggers---
+        # by month
+        triggers_month_trend = stats["trend_triggers_timestamps"]["by_month"]
+        # by week
+        triggers_week_trend = stats["trend_triggers_timestamps"]["by_week"] 
+        # ---pull request triggers end---
+        # create line of data for pull request triggers trend
+        wf_PR_triggers_trend.append(PullRequestTriggersTrend( workflow_name=wf_name, week_triggers_trend=triggers_week_trend, month_triggers_trend=triggers_month_trend))
+
         # average execution time of failling workflow
         # avoid dividing by 0 (0 faillures of the workflow)
         try:

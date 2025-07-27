@@ -16,8 +16,8 @@ const WorkflowFailureChart = ({ data, colorMap }) => {
     if (!data || data.length === 0) {
         return (
             <div className="flex-1 flex flex-col">
-                <h3 className="text-xl font-semibold h-20 text-left">
-                    Workflows by failure rate (%)
+                <h3 className="text-xl font-semibold h-20 text-left text-gray-700">
+                    Failure rate by Workflow
                 </h3>
                 <div className="chart-style flex-1 flex items-center justify-center">
                     <p className="text-gray-500 text-center py-4">
@@ -30,21 +30,26 @@ const WorkflowFailureChart = ({ data, colorMap }) => {
 
     return (
         <div className="flex-1 flex flex-col overflow-hidden">
-            <h3 className="text-xl font-semibold h-20 text-left">
-                Workflows by failure rate (%)
+            <h3 className="text-xl font-semibold h-20 text-left text-gray-700">
+                Failure rate by Workflow
             </h3>
             <div className="chart-style flex-1 overflow-hidden">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                         data={data}
                         layout="vertical"
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                     >
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis
                             type="number"
                             dataKey="faillure_rate"
                             height={40}
+                            label={{
+                                value: '(%)',
+                                position: 'insideBottomRight',
+                                offset: -10
+                            }}
                             tickFormatter={(value) => formatNumber(value*100)}
                             domain={[0, 1]}
                         />

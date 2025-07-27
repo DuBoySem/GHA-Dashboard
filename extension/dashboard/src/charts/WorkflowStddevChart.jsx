@@ -16,8 +16,8 @@ const WorkflowStddevChart = ({ data, colorMap }) => {
     if (!data || data.length === 0) {
         return (
             <div className="my-8 h-80 flex flex-col">
-                <h3 className="text-xl font-semibold h-20 text-left">
-                    Workflows by duration STD DEV (s)
+                <h3 className="text-xl font-semibold h-20 text-left text-gray-700">
+                    Mean Absolute Deviation (MAD) duration per Workflow
                 </h3>
                 <div className="chart-style flex-1 flex items-center justify-center">
                     <p className="text-gray-500 text-center py-4">
@@ -30,13 +30,14 @@ const WorkflowStddevChart = ({ data, colorMap }) => {
     
     return (
         <div className="my-8 h-80 flex flex-col">
-            <h3 className="text-xl font-semibold h-20 text-left">Workflows by duration Mean Absolute Deviation (MAD)</h3>
+            <h3 className="text-xl font-semibold h-20 text-left text-gray-700">Mean Absolute Deviation (MAD) duration per Workflow</h3>
             <div className="chart-style flex-1">
                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data} layout="vertical" margin={{top: 20, right: 30, left: 20, bottom: 5}}>
+                    <BarChart data={data} layout="vertical" margin={{top: 20, right: 30, left: 20, bottom: 20}}>
                         <CartesianGrid strokeDasharray="3 3"/>
                         <XAxis type="number" dataKey="duration_mad"
-                               tickFormatter={(value) => `${formatNumber(value)} s`}
+                               label={{value: '(seconds)', position: 'insideBottomRight', offset: -10}}
+                               tickFormatter={(value) => formatNumber(value)}
                         />
                         <YAxis type="category" dataKey="workflow_name" width={100} hide={true}/>
                         <Tooltip content={<StddevTooltip/>}/>

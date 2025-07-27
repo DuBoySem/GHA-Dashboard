@@ -16,8 +16,8 @@ const AveragePassedTestsChart = ({ data, colorMap }) => {
     if (!data || data.length === 0) {
         return (
             <div className="my-8 h-80 flex flex-col">
-                <h3 className="text-xl font-semibold h-20 text-left">
-                    Average passed tests per workflow
+                <h3 className="text-xl font-semibold h-20 text-left text-gray-700">
+                    Average passed tests per Workflow
                 </h3>
                 <div className="chart-style flex-1 flex items-center justify-center">
                     <p className="text-gray-500 text-center py-4">
@@ -30,21 +30,21 @@ const AveragePassedTestsChart = ({ data, colorMap }) => {
 
     return (
         <div className="my-8 h-80 flex flex-col">
-            <h3 className="text-xl font-semibold h-20 text-left">
-                Average passed tests per workflow
+            <h3 className="text-xl font-semibold h-20 text-left text-gray-700">
+                Average passed tests per Workflow
             </h3>
             <div className="chart-style flex-1">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                         data={data}
                         layout="vertical"
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                     >
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis
                             type="number"
                             dataKey="average_success_rate"
-                            //    label={{value: 'Average passed tests', position: 'insideBottomRight', offset: 0}}
+                            label={{value: '(tests)', position: 'insideBottomRight', offset: -10}}
                             height={40}
                             tickFormatter={(value) => formatNumber(value)}
                         />

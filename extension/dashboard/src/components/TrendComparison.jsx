@@ -4,7 +4,7 @@ const TrendArrowDown = () => <svg xmlns="http://www.w3.org/2000/svg" className="
 
 const TrendStable = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-500 inline-block ml-2" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" /></svg>;
 
-const TrendComparison = ({ transformedData, workflowNames, formatNumber, isPercentage = false }) => {
+const TrendComparison = ({ transformedData, workflowNames, formatNumber, unit = '%' }) => {
     let lastMonthAverage = 0;
     let currentMonthAverage = 0;
     let lastMonthLabel = '';
@@ -26,6 +26,8 @@ const TrendComparison = ({ transformedData, workflowNames, formatNumber, isPerce
         ? currentMonthValues.reduce((sum, val) => sum + val, 0) / currentMonthValues.length
         : 0;
 
+    currentMonthAverage = unit === '%' ? currentMonthAverage * 100 : currentMonthAverage;
+
     const lastMonthData = transformedData[transformedData.length - 2];
     lastMonthLabel = lastMonthData.month;
 
@@ -37,6 +39,8 @@ const TrendComparison = ({ transformedData, workflowNames, formatNumber, isPerce
         ? lastMonthValues.reduce((sum, val) => sum + val, 0) / lastMonthValues.length
         : 0;
 
+    lastMonthAverage = unit === '%' ? lastMonthAverage * 100 : lastMonthAverage;
+
     if (currentMonthAverage > lastMonthAverage) {
         trendIcon = <TrendArrowDown />;
     } else if (currentMonthAverage < lastMonthAverage) {
@@ -45,26 +49,18 @@ const TrendComparison = ({ transformedData, workflowNames, formatNumber, isPerce
         trendIcon = <TrendStable />;
     }
 
-    const formatValue = (value) => {
-        if (isPercentage) {
-            return `${formatNumber(value * 100)}%`;
-        }
-
-        return formatNumber(value);
-    };
-
     return (
         <div className="chart-style h-28 flex justify-around items-center mb-4 p-4">
             <div className="text-center">
                 <p className="text-sm text-gray-600">{`Average for ${lastMonthLabel}`}</p>
-                <p className="text-lg font-bold text-gray-800">{formatValue(lastMonthAverage)}</p>
+                <p className="text-lg font-bold text-gray-800">{`${formatNumber(lastMonthAverage)}${unit}`}</p>
             </div>
             <div className="flex items-center mx-4">
                 {trendIcon}
             </div>
             <div className="text-center">
                 <p className="text-sm text-gray-600">{`Average for ${currentMonthLabel}`}</p>
-                <p className="text-lg font-bold text-gray-800">{formatValue(currentMonthAverage)}</p>
+                <p className="text-lg font-bold text-gray-800">{`${formatNumber(currentMonthAverage)}${unit}`}</p>
             </div>
         </div>
     );

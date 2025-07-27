@@ -16,8 +16,8 @@ const AverageFailedWorkflowExecutionTimeChart = ({ data, colorMap }) => {
     if (!data || data.length === 0) {
         return (
             <div className="my-8 h-80 flex flex-col">
-                <h3 className="text-xl font-semibold h-20 text-left">
-                    Average failed workflow duration (s)
+                <h3 className="text-xl font-semibold h-20 text-left text-gray-700">
+                    Median duration of failed runs per Workflow
                 </h3>
                 <div className="chart-style flex-1 flex items-center justify-center">
                     <p className="text-gray-500 text-center py-4">
@@ -30,15 +30,15 @@ const AverageFailedWorkflowExecutionTimeChart = ({ data, colorMap }) => {
 
     return (
         <div className="my-8 h-80 flex flex-col">
-            <h3 className="text-xl font-semibold h-20 text-left">Median failed workflow duration</h3>
+            <h3 className="text-xl font-semibold h-20 text-left text-gray-700">Median duration of failed runs per Workflow</h3>
             <div className="chart-style flex-1">
                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data} layout="vertical" margin={{top: 20, right: 30, left: 20, bottom: 5}}>
+                    <BarChart data={data} layout="vertical" margin={{top: 20, right: 30, left: 20, bottom: 20}}>
                         <CartesianGrid strokeDasharray="3 3"/>
                         <XAxis type="number" dataKey="fail_mad"
-                               label={{value: 'Median duration', position: 'insideBottomRight', offset: 0}}
+                               label={{value: '(seconds)', position: 'insideBottomRight', offset: -10}}
                                height={40}
-                               tickFormatter={(value) => `${formatNumber(value)} s`}
+                               tickFormatter={(value) => formatNumber(value)}
                         />
                         <YAxis type="category" dataKey="workflow_name" width={100} hide={true}/>
                         <Tooltip content={<AverageFailedWorkflowExecutionTimeTooltip/>}/>

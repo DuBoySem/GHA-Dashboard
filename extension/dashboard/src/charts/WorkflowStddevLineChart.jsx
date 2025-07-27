@@ -5,8 +5,7 @@ import {
     Line,
     XAxis,
     YAxis,
-    CartesianGrid,
-    Legend
+    CartesianGrid
 } from 'recharts';
 
 import StddevTrendTooltip from '../components/tooltips/StddevTrendTooltip.jsx';
@@ -20,7 +19,7 @@ const WorkflowStddevLineChart = ({ data, colorMap }) => {
     if (!transformedData || transformedData.length === 0) {
         return (
             <div className="my-8 h-120 flex flex-col">
-                <h3 className="text-xl font-semibold h-20 text-left">Mean Absolute Deviation (MAD) per Workflow (Monthly Trend)</h3>
+                <h3 className="text-xl font-semibold h-20 text-left text-gray-700">Mean Absolute Deviation (MAD) duration per Workflow (Monthly Trend)</h3>
                 <div className="chart-style flex-1 flex items-center justify-center">
                     <p className="text-gray-500 text-center py-4">No data available</p>
                 </div>
@@ -30,12 +29,13 @@ const WorkflowStddevLineChart = ({ data, colorMap }) => {
 
     return (
         <div className="my-8 h-120 flex flex-col">
-            <h3 className="text-xl font-semibold h-20 text-left">Mean Absolute Deviation (MAD) per Workflow (Monthly Trend)</h3>
+            <h3 className="text-xl font-semibold h-20 text-left text-gray-700">Mean Absolute Deviation (MAD) duration per Workflow (Monthly Trend)</h3>
 
             <TrendComparison
                 transformedData={transformedData}
                 workflowNames={workflowNames}
                 formatNumber={formatNumber}
+                unit=' s'
             />
 
             <div className="chart-style flex-1">
@@ -45,8 +45,8 @@ const WorkflowStddevLineChart = ({ data, colorMap }) => {
                         margin={{
                             top: 20,
                             right: 30,
-                            left: 20,
-                            bottom: 40,
+                            left: 0,
+                            bottom: 5,
                         }}
                     >
                         <CartesianGrid strokeDasharray="3 3" />
@@ -55,16 +55,9 @@ const WorkflowStddevLineChart = ({ data, colorMap }) => {
                             angle={-30}
                             textAnchor="end"
                             height={40}
-                            label={{ value: 'Month', position: 'insideBottomRight', offset: -25 }}
                         />
                         <YAxis
                             tickFormatter={(value) => `${formatNumber(value)} s`}
-                            label={{
-                                value: 'MAD',
-                                angle: -90,
-                                position: 'insideLeft',
-                                offset: 0
-                            }}
                         />
                         <Tooltip content={<StddevTrendTooltip />} />
                         {workflowNames.map((name) => (

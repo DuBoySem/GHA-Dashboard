@@ -19,7 +19,7 @@ const WorkflowFailureLineChart = ({ data, colorMap }) => {
     if (!transformedData || transformedData.length === 0) {
         return (
             <div className="my-8 h-120 flex flex-col">
-                <h3 className="text-xl font-semibold h-20 text-left">Failure per Workflow (Monthly Trend)</h3>
+                <h3 className="text-xl font-semibold h-20 text-left text-gray-700">Failure per Workflow (Monthly Trend)</h3>
                 <div className="chart-style flex-1 flex items-center justify-center">
                     <p className="text-gray-500 text-center py-4">No data available</p>
                 </div>
@@ -29,13 +29,12 @@ const WorkflowFailureLineChart = ({ data, colorMap }) => {
 
     return (
         <div className="my-8 h-120 flex flex-col">
-            <h3 className="text-xl font-semibold h-20 text-left">Failure per Workflow (Monthly Trend)</h3>
+            <h3 className="text-xl font-semibold h-20 text-left text-gray-700">Failure per Workflow (Monthly Trend)</h3>
 
             <TrendComparison
                 transformedData={transformedData}
                 workflowNames={workflowNames}
                 formatNumber={formatNumber}
-                isPercentage={true}
             />
 
             <div className="chart-style flex-1">
@@ -45,8 +44,8 @@ const WorkflowFailureLineChart = ({ data, colorMap }) => {
                         margin={{
                             top: 20,
                             right: 30,
-                            left: 20,
-                            bottom: 40,
+                            left: 0,
+                            bottom: 5,
                         }}
                     >
                         <CartesianGrid strokeDasharray="3 3" />
@@ -55,17 +54,10 @@ const WorkflowFailureLineChart = ({ data, colorMap }) => {
                             angle={-30}
                             textAnchor="end"
                             height={40}
-                            label={{ value: 'Month', position: 'insideBottomRight', offset: -25 }}
                         />
                         <YAxis
                             tickFormatter={(value) => `${formatNumber(value * 100)}%`}
                             domain={[0, 1]}
-                            label={{
-                                value: 'Failure Rate',
-                                angle: -90,
-                                position: 'insideLeft',
-                                offset: 0
-                            }}
                         />
                         <Tooltip content={<FailuresTooltip />} />
                         {workflowNames.map((name) => (

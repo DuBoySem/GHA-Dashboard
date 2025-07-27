@@ -275,7 +275,7 @@ def generate_metrics(grouped_workflows, grouped_issuers, wf_fail_rate,issuer_fai
         except ZeroDivisionError:
             wf_fail_duration.append(
                 AverageFailedWorkflowExecutionTime(
-                    workflow_name=wf_name, average_duration=0.0
+                    workflow_name=wf_name, average_duration=-1.0
                 )
             )
         # tests part
@@ -290,6 +290,11 @@ def generate_metrics(grouped_workflows, grouped_issuers, wf_fail_rate,issuer_fai
             wf_tests_passed.append(
                 AveragePassedTestsPerWorkflowExcecution(workflow_name=wf_name, average_success_rate=avg_passed_tests)
             )
+        # else:
+        #     wf_tests_passed.append(
+        #         AveragePassedTestsPerWorkflowExcecution(workflow_name=wf_name, average_success_rate=0.0)
+        #     )
+
     for iss_name, stats in grouped_issuers.items():
         iss_fail_rate = round(stats["fail"] / stats["total"], 2)
         issuer_fail_rate.append(

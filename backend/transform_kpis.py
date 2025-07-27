@@ -122,8 +122,6 @@ def compute_kpis(raw_dict):
             "failed_durations": [],
             "trend_duration_timestamps": DefaultDict(lambda: DefaultDict(list)),
             "trend_failed_duration_timestamps": DefaultDict(lambda: DefaultDict(list)),
-            # can be used to get fail rate trends for pull request triggers not implemented yet
-            # "trend_triggers_timestamps": DefaultDict(lambda: DefaultDict(lambda:{"total":0})),
             "trend_triggers_timestamps": DefaultDict(lambda: DefaultDict(int)),
             "sum_fail_time": 0,
             "total_times_tests_ran": 0,
@@ -245,9 +243,11 @@ def compute_kpis(raw_dict):
     wf_tests_passed = []
     wf_test_churn = []
 
+    normalize_timestamps(grouped_workflows)
     #---
     generate_metrics(grouped_workflows, grouped_issuers, wf_fail_rate, wf_PR_triggers_trend, issuer_fail_rate, wf_stddev, wf_fail_duration, wf_tests_passed, wf_test_churn)
     #---
+
     # setting up structure
     kpis_json = {
         "AverageFaillureRatePerWorkflow": [asdict(ele) for ele in wf_fail_rate],
@@ -410,6 +410,53 @@ def get_month(timestamp):
     dt = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
     # format "2025-07"
     return dt.strftime("%Y-%m")
+
+# normalise date (add missing timestamps and sets the value to 0)
+def normalize_timestamps(grouped_workflows):
+    timestamps = DefaultDict(set)
+    # get all timestamps for each metric
+    # iterate over each workflow
+    for workflow_element in grouped_workflows.values():
+        # iterate over each property from each workflow to get the "timestamps"
+        for property, property_data in workflow_element.items():
+            # check if there is "timestamps" in property name
+            if "timestamps" in property:
+                # iterate over timestamps keys (by month or by week)
+                for time_type, data in property_data.items():
+                    timestamps[(property, time_type)].update(data.keys())
+
+    #normalize timestamps
+    for workflow_element in grouped_workflows.values():
+        for (property,time_type), timestamp_values in timestamps.items():
+            property_data=workflow_element[property]
+            time_group = property_data[time_type]
+            # check property
+            # set values of missing timestamps for the conclusion of executions
+            if property == "trend_conclusion_timestamps":
+                def_val = {"total":0, "fail":0}
+            # set values of missing timestamps for the workflow duration trends
+            elif "duration" in property:
+                def_val = [0]
+            # set values of missing timestamps for the PR triggers
+            elif property == "trend_triggers_timestamps":
+                def_val = 0
+            else:
+                continue
+
+            # fill with new timestamps
+            for timestamp_val in timestamp_values:
+                if timestamp_val not in time_group:
+                    # time_group[timestamp_val] = def_val.copy() if isinstance(def_val, dict) else list(def_val)
+                    if isinstance(def_val, dict):
+                        time_group[timestamp_val] = def_val.copy()
+                    elif isinstance(def_val, list):
+                        time_group[timestamp_val] = []
+                    else:
+                        time_group[timestamp_val] = def_val
+
+            #sort the timestamps
+            workflow_element[property][time_type] = dict(sorted(time_group.items()))
+
 
 # main function
 def compute(csv_path_read:str,json_path_write:str):

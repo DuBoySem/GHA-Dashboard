@@ -1,5 +1,5 @@
 const SideMenuItem = ({ workflowName, isSelected, onClick, color }) => {
-    const itemClasses = `sidemenu-item ${
+    const itemClasses = `sidemenu-item flex items-center ${
         isSelected ? "sidemenu-item-selected" : "hover:bg-red-200"
     }`;
 

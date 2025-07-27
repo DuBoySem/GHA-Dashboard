@@ -25,9 +25,9 @@ export const transformTrendData = (data, trendKey = 'month_average_trend') => {
         data.forEach(workflow => {
             const workflowName = workflow.workflow_name;
             
-            monthEntry[workflowName] = workflowDataMap[workflowName]
-                ? workflowDataMap[workflowName][month] || null
-                : null;
+            monthEntry[workflowName] = (workflowDataMap[workflowName] && workflowDataMap[workflowName][month] !== undefined)
+                           ? workflowDataMap[workflowName][month]
+                           : 0;
         });
 
         return monthEntry;

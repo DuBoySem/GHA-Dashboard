@@ -10,6 +10,7 @@ import SideMenu from "../components/menu/SideMenu.jsx";
 import * as d3 from "d3-scale-chromatic";
 import WorkflowFailureLineChart from "../charts/WorkflowFailureLineChart.jsx";
 import WorkflowStddevLineChart from "../charts/WorkflowStddevLineChart.jsx";
+import PullRequestTriggersLineChart from "../charts/PullRequestTriggersLineChart.jsx";
 
 const DashboardPage = () => {
     const token = useStore((state) => state.token)
@@ -112,6 +113,14 @@ const DashboardPage = () => {
         return kpis.StdDevWorkflowExecutions.filter(wf => selectedWorkflows.includes(wf.workflow_name));
     }, [kpis.StdDevWorkflowExecutions, selectedWorkflows]);
 
+    const filteredPullRequestTriggers = useMemo(() => {
+        if (!kpis.PullRequestTriggersTrend) {
+            return [];
+        }
+
+        return kpis.PullRequestTriggersTrend.filter(wf => selectedWorkflows.includes(wf.workflow_name));
+    }, [kpis.PullRequestTriggersTrend, selectedWorkflows]);
+
     const filteredWorkflowStddev = useMemo(() => {
         if (!kpis.StdDevWorkflowExecutions) {
             return [];
@@ -173,19 +182,25 @@ const DashboardPage = () => {
             ? kpis.AverageFailedWorkflowExecutionTime.map(wf => wf.workflow_name)
             : [];
 
+        const namesFromPRTriggers = kpis.PullRequestTriggersTrend
+            ? kpis.PullRequestTriggersTrend.map(wf => wf.workflow_name)
+            : [];
+
         return Array.from(new Set([
             ...namesFromFailureRate,
             ...namesFromStdDev,
             ...namesFromPassedTests,
             ...namesFromChangedTests,
-            ...namesFromFailedExecTime
+            ...namesFromFailedExecTime,
+            ...namesFromPRTriggers
         ]));
     }, [
         kpis.AverageFaillureRatePerWorkflow,
         kpis.StdDevWorkflowExecutions,
         kpis.AveragePassedTestsPerWorkflowExcecution,
         kpis.AverageChangedTestsPerWorkflowExecution,
-        kpis.AverageFailedWorkflowExecutionTime
+        kpis.AverageFailedWorkflowExecutionTime,
+        kpis.PullRequestTriggersTrend
     ]);
 
     const colorMap = useMemo(() => {
@@ -207,7 +222,7 @@ const DashboardPage = () => {
                     <div className="grid grid-cols-3 gap-10 mb-3 flex-grow-[2]">
                         <WorkflowFailureLineChart data={filteredWorkflowMonthlyFailures} colorMap={colorMap} />
                         <WorkflowStddevLineChart data={filteredWorkflowMonthlyStdDevDuration} colorMap={colorMap} />
-                        <WorkflowFailureLineChart data={filteredWorkflowMonthlyFailures} colorMap={colorMap} />
+                        <PullRequestTriggersLineChart data={filteredPullRequestTriggers} colorMap={colorMap} />
                     </div>
                     <div className="grid grid-cols-4 gap-10 mb-3 flex-grow">
                         <WorkflowStddevChart data={filteredWorkflowStddev} colorMap={colorMap} />

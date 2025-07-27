@@ -33,7 +33,7 @@ const WorkflowFailureChart = ({ data, colorMap }) => {
             <h3 className="text-xl font-semibold h-20 text-left text-gray-700">
                 Failure rate by Workflow
             </h3>
-            <div className="chart-style flex-1 overflow-hidden">
+            <div className="chart-style flex-1 overflow-hidden mb-8">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                         data={data}

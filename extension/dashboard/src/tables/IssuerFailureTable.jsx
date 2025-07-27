@@ -207,7 +207,7 @@ export const IssuerFailureTable = ({ data }) => {
                 </table>
             </div>
             {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-4 mt-4">
+                <div className="flex justify-center items-center h-16">
                     <button
                         onClick={handlePrev}
                         disabled={page === 1}
@@ -215,7 +215,7 @@ export const IssuerFailureTable = ({ data }) => {
                     >
                         Back
                     </button>
-                    <span className="text-gray-700">
+                    <span className="text-gray-700 mx-4">
                         {page} / {totalPages}
                     </span>
                     <button

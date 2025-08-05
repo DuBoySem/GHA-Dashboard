@@ -57,29 +57,29 @@ const DashboardPage = () => {
 
             setKpis(parsedData);
 
-            if (parsedData?.MedianDurationPerWorkflowExecution) {
-                const allWorkflows =
-                    parsedData.MedianDurationPerWorkflowExecution.map(
-                        (wf) => wf.workflow_name
-                    );
-                setSelectedWorkflows(allWorkflows);
-            }
-
-            // if(msg.data.source !== "BACKGROUND_SCRIPT") return;
-
-            // if(msg.data.type==="KPI_STREAM"){
-            //     try {
-            //         const parsedData = msg.data.payload;
-            //         setKpis(parsedData);
-
-            //         if (parsedData?.MedianDurationPerWorkflowExecution) {
-            //             const allWorkflows = parsedData.MedianDurationPerWorkflowExecution.map(wf => wf.workflow_name);
-            //             setSelectedWorkflows(allWorkflows);
-            //         }
-            //     } catch (e) {
-            //         console.log("Error parsing streamed kpis: ", e);
-            //     }
+            // if (parsedData?.MedianDurationPerWorkflowExecution) {
+            //     const allWorkflows =
+            //         parsedData.MedianDurationPerWorkflowExecution.map(
+            //             (wf) => wf.workflow_name
+            //         );
+            //     setSelectedWorkflows(allWorkflows);
             // }
+
+            if(msg.data.source !== "BACKGROUND_SCRIPT") return;
+
+            if(msg.data.type==="KPI_STREAM"){
+                try {
+                    const parsedData = msg.data.payload;
+                    setKpis(parsedData);
+
+                    if (parsedData?.MedianDurationPerWorkflowExecution) {
+                        const allWorkflows = parsedData.MedianDurationPerWorkflowExecution.map(wf => wf.workflow_name);
+                        setSelectedWorkflows(allWorkflows);
+                    }
+                } catch (e) {
+                    console.log("Error parsing streamed kpis: ", e);
+                }
+            }
         };
 
         const launch = async () => {
@@ -416,155 +416,6 @@ const DashboardPage = () => {
                 />
                 <IssuerFailureTable data={kpis.AverageFaillureRatePerIssuer} />
             </div>
-            {/* <div className="flex-1 p-4 bg-white flex flex-col overflow-hidden">
-                <div className="divide-y  divide-gray-200 flex-1 flex flex-col"> */}
-            {/* Grouped charts: chart + line chart */}
-            {/* <div className="grid grid-cols-2"> */}
-            {/* <div className="flex flex-col gap-4 border-r-2 border-gray-200 pr-4">
-                            <WorkflowFailureLineChart
-                                data={filteredWorkflowMonthlyFailures}
-                                colorMap={colorMap}
-                            />
-                            <WorkflowFailureChart
-                                data={filteredWorkflowFailures}
-                                colorMap={colorMap}
-                            />
-                        </div> */}
-            {/* <KpiCard
-                            className="flex-1"
-                            title="Workflow Run Failures"
-                            lineTitle="Trends (monthly)"
-                            barTitle="Median per workflow"
-                            summary={
-                                <SummaryBox
-                                    prevMonth={summary.prevMonth}
-                                    currentMonth={summary.currentMonth}
-                                />
-                            }
-                            lineChart={
-                                <WorkflowFailureLineChart
-                                    data={filteredWorkflowMonthlyFailures}
-                                    colorMap={colorMap}
-                                />
-                            }
-                            barChart={
-                                <AverageChangedTestsChart
-                                    data={filteredAverageChangedTests}
-                                    colorMap={colorMap}
-                                />
-                            }
-                        />
-                        <KpiCard
-                            className="flex-1"
-                            title="Workflow Run Failures"
-                            summary={
-                                <TrendComparison
-                                    transformedData={filteredWorkflowFailures}
-                                    workflowNames={allWorkflowNames}
-                                    formatNumber={formatNumber}
-                                    unit="%"
-                                />
-                            }
-                            barChart={
-                                <WorkflowFailureChart
-                                    data={filteredWorkflowFailures}
-                                    colorMap={colorMap}
-                                />
-                            }
-                            lineChart={
-                                <WorkflowFailureLineChart
-                                    data={filteredWorkflowMonthlyFailures}
-                                    colorMap={colorMap}
-                                />
-                            }
-                        />
-                        <KpiCard
-                            title="Workflow Run Failures"
-                            summary={
-                                <TrendComparison
-                                    transformedData={filteredWorkflowFailures}
-                                    workflowNames={allWorkflowNames}
-                                    formatNumber={formatNumber}
-                                    unit="%"
-                                />
-                            }
-                            barChart={
-                                <WorkflowFailureChart
-                                    data={filteredWorkflowFailures}
-                                    colorMap={colorMap}
-                                />
-                            }
-                            lineChart={
-                                <WorkflowFailureLineChart
-                                    data={filteredWorkflowMonthlyFailures}
-                                    colorMap={colorMap}
-                                />
-                            }
-                        /> */}
-            {/* <div className="flex flex-col gap-4 border-r-2 border-gray-200 pr-4">
-                            <WorkflowStddevLineChart
-                                data={filteredWorkflowMonthlyMedianDuration}
-                                colorMap={colorMap}
-                            />
-                            <WorkflowStddevChart
-                                data={filteredWorkflowStddev}
-                                colorMap={colorMap}
-                            />
-                        </div>
-                        <div className="flex flex-col gap-4 border-r-2 border-gray-200 pr-4">
-                            <AveragePassedTestsLineChart
-                                data={filteredMedianPassedTests}
-                                colorMap={colorMap}
-                            />
-                            <AveragePassedTestsChart
-                                data={filteredMedianPassedTests}
-                                colorMap={colorMap}
-                            />
-                        </div>
-                        <div className="flex flex-col gap-4 border-r-2 border-gray-200 pr-4">
-                            <AverageChangedTestsLineChart
-                                data={filteredAverageChangedTests}
-                                colorMap={colorMap}
-                            />
-                            <AverageChangedTestsChart
-                                data={filteredAverageChangedTests}
-                                colorMap={colorMap}
-                            />
-                        </div>
-                        <div className="flex flex-col gap-4 border-r-2 border-gray-200 pr-4">
-                            <AverageFailedWorkflowExecutionTimeLineChart
-                                data={
-                                    filteredAverageFailedWorkflowExecutionTime
-                                }
-                                colorMap={colorMap}
-                            />
-                            <AverageFailedWorkflowExecutionTimeChart
-                                data={
-                                    filteredAverageFailedWorkflowExecutionTime
-                                }
-                                colorMap={colorMap}
-                            />
-                        </div> 
-                    </div> *
-                     <div className="grid grid-cols-2 gap-10">
-                        {/* <PullRequestTriggersLineChart
-                            data={filteredPullRequestTriggers}
-                            colorMap={colorMap}
-                        />
-                        <IssuerFailureTable
-                            data={kpis.AverageFaillureRatePerIssuer}
-                        /> 
-                          
-                    </div> 
-            {/* </div> */}
-            {/* </div> */}
-            {/* <div className="grid grid-cols-2 gap-10">
-                <PullRequestTriggersLineChart
-                    data={filteredPullRequestTriggers}
-                    colorMap={colorMap}
-                />
-                {/* <IssuerFailureTable data={kpis.AverageFaillureRatePerIssuer} /> 
-            </div> */}
         </div>
     );
 };

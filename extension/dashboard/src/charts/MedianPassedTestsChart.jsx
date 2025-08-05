@@ -1,17 +1,18 @@
 import {
+    Tooltip,
+    ResponsiveContainer,
     BarChart,
     Bar,
     XAxis,
     YAxis,
-    Tooltip,
-    Cell,
-    ResponsiveContainer,
     CartesianGrid,
+    Cell,
 } from "recharts";
-import StddevTooltip from "../components/tooltips/StddevTooltip.jsx";
-import { formatNumber } from "../utils/formatNumber";
 
-const WorkflowStddevChart = ({ data, colorMap }) => {
+import AveragePassedTestsTooltip from "../components/tooltips/AveragePassedTestsTooltip.jsx";
+import { formatNumber } from "../utils/formatNumber.js";
+
+const MedianPassedTestsChart = ({ data, colorMap }) => {
     if (!data || data.length === 0) {
         return (
             <div className="flex-col flex items-center justify-center p-4">
@@ -29,12 +30,12 @@ const WorkflowStddevChart = ({ data, colorMap }) => {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
                         type="number"
-                        dataKey="duration_median"
-                        height={40}
+                        dataKey="median_success_rate"
                         label={{
-                            value: "(seconds)",
+                            value: "(tests)",
                             position: "insideBottomRight",
                         }}
+                        height={40}
                         tickFormatter={(value) => formatNumber(value)}
                     />
                     <YAxis
@@ -43,9 +44,9 @@ const WorkflowStddevChart = ({ data, colorMap }) => {
                         width={100}
                         hide={true}
                     />
-                    <Tooltip content={<StddevTooltip />} />
+                    <Tooltip content={<AveragePassedTestsTooltip />} />
                     <Bar
-                        dataKey="duration_median"
+                        dataKey="median_success_rate"
                         label={({ x, y, width, height, value }) => (
                             <text
                                 x={x + width + 5}
@@ -71,4 +72,4 @@ const WorkflowStddevChart = ({ data, colorMap }) => {
     );
 };
 
-export default WorkflowStddevChart;
+export default MedianPassedTestsChart;

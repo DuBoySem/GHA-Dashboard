@@ -1,17 +1,18 @@
 import {
+    Tooltip,
+    ResponsiveContainer,
     BarChart,
     Bar,
     XAxis,
     YAxis,
-    Tooltip,
     Cell,
-    ResponsiveContainer,
     CartesianGrid,
 } from "recharts";
-import StddevTooltip from "../components/tooltips/StddevTooltip.jsx";
+
+import AverageChangedTestsTooltip from "../components/tooltips/AverageChangedTestsTooltip.jsx";
 import { formatNumber } from "../utils/formatNumber";
 
-const WorkflowStddevChart = ({ data, colorMap }) => {
+const MedianChangedTestsChart = ({ data, colorMap }) => {
     if (!data || data.length === 0) {
         return (
             <div className="flex-col flex items-center justify-center p-4">
@@ -22,30 +23,36 @@ const WorkflowStddevChart = ({ data, colorMap }) => {
         );
     }
 
+    // Utilise la clé 'median_value' pour le bar chart
+    const chartData = data.map((item) => ({
+        workflow_name: item.workflow_name,
+        value: item.median_value,
+    }));
+
     return (
         <div className="flex-1 overflow-hidden">
             <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={data} layout="vertical">
+                <BarChart data={chartData} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
+                        dataKey="value"
                         type="number"
-                        dataKey="duration_median"
-                        height={40}
+                        tickFormatter={(value) => formatNumber(value)}
                         label={{
-                            value: "(seconds)",
+                            value: "(lines)",
                             position: "insideBottomRight",
                         }}
-                        tickFormatter={(value) => formatNumber(value)}
+                        height={40}
                     />
                     <YAxis
-                        type="category"
                         dataKey="workflow_name"
+                        type="category"
                         width={100}
                         hide={true}
                     />
-                    <Tooltip content={<StddevTooltip />} />
+                    <Tooltip content={<AverageChangedTestsTooltip />} />
                     <Bar
-                        dataKey="duration_median"
+                        dataKey="value"
                         label={({ x, y, width, height, value }) => (
                             <text
                                 x={x + width + 5}
@@ -58,7 +65,7 @@ const WorkflowStddevChart = ({ data, colorMap }) => {
                             </text>
                         )}
                     >
-                        {data.map((workflow) => (
+                        {chartData.map((workflow) => (
                             <Cell
                                 key={workflow["workflow_name"]}
                                 fill={colorMap[workflow["workflow_name"]]}
@@ -71,4 +78,4 @@ const WorkflowStddevChart = ({ data, colorMap }) => {
     );
 };
 
-export default WorkflowStddevChart;
+export default MedianChangedTestsChart;

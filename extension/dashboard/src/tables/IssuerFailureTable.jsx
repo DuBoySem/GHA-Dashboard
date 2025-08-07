@@ -1,17 +1,15 @@
 import React, { useState } from "react";
 export const IssuerFailureTable = ({ data }) => {
-    // Recherche et tri
     const [search, setSearch] = useState("");
+
     const [sortConfig, setSortConfig] = useState({
-        key: "faillure_rate",
+        key: "failed_runs",
         direction: "desc",
     });
 
-    // Pagination
     const rowsPerPage = 10;
     const [page, setPage] = useState(1);
 
-    // Ajout dynamique du champ failed_runs
     const dataWithFailedRuns = (data || []).map((row) => ({
         ...row,
         failed_runs:
@@ -26,7 +24,6 @@ export const IssuerFailureTable = ({ data }) => {
                 : 0,
     }));
 
-    // Filtrage par recherche
     const filteredData =
         dataWithFailedRuns.length > 0
             ? dataWithFailedRuns.filter((row) =>
@@ -34,7 +31,6 @@ export const IssuerFailureTable = ({ data }) => {
               )
             : [];
 
-    // Tri (ajout du tri sur failed_runs)
     const sortedData = filteredData.slice().sort((a, b) => {
         const { key, direction } = sortConfig;
         let aValue = a[key];
@@ -83,16 +79,16 @@ export const IssuerFailureTable = ({ data }) => {
 
     return (
         <div className="flex-1 overflow-hidden flex flex-col">
-            <div className="flex flex-row items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold">
-                    Contributors by failure rate
+            <div className="flex flex-row items-start justify-between h-20">
+                <h3 className="text-xl font-semibold text-gray-700">
+                    Failure rate by Contributor
                 </h3>
                 <input
                     type="text"
                     placeholder="Search contributor..."
                     value={search}
                     onChange={handleSearch}
-                    className="border border-gray-300 rounded px-3 py-1 ml-2 w-64"
+                    className="border border-gray-300 rounded px-3 py-2 ml-2 w-64 text-gray-500"
                     style={{ minWidth: 0 }}
                 />
             </div>
@@ -101,13 +97,13 @@ export const IssuerFailureTable = ({ data }) => {
                     <thead className="bg-gray-100 sticky top-0 z-10">
                         <tr>
                             <th className="px-4 py-2 text-left border-r border-gray-200">
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-1 text-gray-700">
                                     Contributor
                                     <button
                                         onClick={() =>
                                             handleSort("issuer_name")
                                         }
-                                        className="ml-1 text-xs px-1 py-0.5 rounded border border-gray-300 bg-white hover:bg-gray-200"
+                                        className="ml-1 text-xs px-1 py-0.5 rounded border border-gray-300 bg-white hover:bg-gray-200 text-gray-500"
                                     >
                                         {sortConfig.key === "issuer_name"
                                             ? sortConfig.direction === "asc"
@@ -118,13 +114,13 @@ export const IssuerFailureTable = ({ data }) => {
                                 </div>
                             </th>
                             <th className="px-4 py-2 text-left">
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-1 text-gray-700">
                                     Failure rate (%)
                                     <button
                                         onClick={() =>
                                             handleSort("faillure_rate")
                                         }
-                                        className="ml-1 text-xs px-1 py-0.5 rounded border border-gray-300 bg-white hover:bg-gray-200"
+                                        className="ml-1 text-xs px-1 py-0.5 rounded border border-gray-300 bg-white hover:bg-gray-200 text-gray-500"
                                     >
                                         {sortConfig.key === "faillure_rate"
                                             ? sortConfig.direction === "asc"
@@ -135,13 +131,13 @@ export const IssuerFailureTable = ({ data }) => {
                                 </div>
                             </th>
                             <th className="px-4 py-2 text-left">
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-1 text-gray-700">
                                     Total runs
                                     <button
                                         onClick={() =>
                                             handleSort("execution_number")
                                         }
-                                        className="ml-1 text-xs px-1 py-0.5 rounded border border-gray-300 bg-white hover:bg-gray-200"
+                                        className="ml-1 text-xs px-1 py-0.5 rounded border border-gray-300 bg-white hover:bg-gray-200 text-gray-500"
                                     >
                                         {sortConfig.key === "execution_number"
                                             ? sortConfig.direction === "asc"
@@ -152,13 +148,13 @@ export const IssuerFailureTable = ({ data }) => {
                                 </div>
                             </th>
                             <th className="px-4 py-2 text-left">
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-1 text-gray-700">
                                     Failed runs
                                     <button
                                         onClick={() =>
                                             handleSort("failed_runs")
                                         }
-                                        className="ml-1 text-xs px-1 py-0.5 rounded border border-gray-300 bg-white hover:bg-gray-200"
+                                        className="ml-1 text-xs px-1 py-0.5 rounded border border-gray-300 bg-white hover:bg-gray-200 text-gray-500"
                                     >
                                         {sortConfig.key === "failed_runs"
                                             ? sortConfig.direction === "asc"
@@ -181,18 +177,18 @@ export const IssuerFailureTable = ({ data }) => {
                                             : ""
                                     }`}
                                 >
-                                    <td className="px-4 py-2 border-r border-gray-200">
+                                    <td className="px-4 py-2 border-r border-gray-200 text-gray-700">
                                         {row.issuer_name}
                                     </td>
-                                    <td className="px-4 py-2 border-r border-gray-200">
+                                    <td className="px-4 py-2 border-r border-gray-200 text-gray-700">
                                         {(row.faillure_rate * 100).toFixed(2)}
                                     </td>
-                                    <td className="px-4 py-2">
+                                    <td className="px-4 py-2 text-gray-700">
                                         {row.total_runs !== undefined
                                             ? row.total_runs
                                             : row.execution_number}
                                     </td>
-                                    <td className="px-4 py-2">
+                                    <td className="px-4 py-2 text-gray-700">
                                         {row.failed_runs}
                                     </td>
                                 </tr>
@@ -210,23 +206,22 @@ export const IssuerFailureTable = ({ data }) => {
                     </tbody>
                 </table>
             </div>
-            {/* Pagination controls */}
             {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-4 mt-4">
+                <div className="flex justify-center items-center h-16">
                     <button
                         onClick={handlePrev}
                         disabled={page === 1}
-                        className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-3 py-1 rounded bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-white"
                     >
                         Back
                     </button>
-                    <span>
+                    <span className="text-gray-700 mx-4">
                         {page} / {totalPages}
                     </span>
                     <button
                         onClick={handleNext}
                         disabled={page === totalPages}
-                        className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-3 py-1 rounded bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-white"
                     >
                         Next
                     </button>

@@ -52,18 +52,8 @@ const DashboardPage = () => {
     };
 
     useEffect(() => {
-        const handleSSEUpdate = (msg) => {
-            if (msg.source !== window) return;
-
-            setKpis(parsedData);
-
-            // if (parsedData?.MedianDurationPerWorkflowExecution) {
-            //     const allWorkflows =
-            //         parsedData.MedianDurationPerWorkflowExecution.map(
-            //             (wf) => wf.workflow_name
-            //         );
-            //     setSelectedWorkflows(allWorkflows);
-            // }
+        const handleSSEUpdate = msg => {
+            if(msg.source !== window) return;
 
             if(msg.data.source !== "BACKGROUND_SCRIPT") return;
 

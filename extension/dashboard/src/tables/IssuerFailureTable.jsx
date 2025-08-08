@@ -180,18 +180,18 @@ export const IssuerFailureTable = ({ data }) => {
                                             : ""
                                     }`}
                                 >
-                                    <td className="px-4 py-2 border-r border-gray-200 text-gray-700">
+                                    <td className="px-4 py-2 border-r border-gray-200 text-white">
                                         {row.issuer_name}
                                     </td>
-                                    <td className="px-4 py-2 border-r border-gray-200 text-gray-700">
+                                    <td className="px-4 py-2 border-r border-gray-200 text-white">
                                         {(row.faillure_rate * 100).toFixed(2)}
                                     </td>
-                                    <td className="px-4 py-2 text-gray-700">
+                                    <td className="px-4 py-2 text-white">
                                         {row.total_runs !== undefined
                                             ? row.total_runs
                                             : row.execution_number}
                                     </td>
-                                    <td className="px-4 py-2 text-gray-700">
+                                    <td className="px-4 py-2 text-white">
                                         {row.failed_runs}
                                     </td>
                                 </tr>

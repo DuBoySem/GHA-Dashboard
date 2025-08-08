@@ -160,7 +160,7 @@ def compute_kpis(raw_dict):
             "trend_churn_timestamps": DefaultDict(lambda: DefaultDict(list)),
             "trend_duration_timestamps": DefaultDict(lambda: DefaultDict(list)),
             "trend_failed_duration_timestamps": DefaultDict(lambda: DefaultDict(list)),
-            "trend_triggers_timestamps": DefaultDict(lambda: DefaultDict(int)),
+            "trend_triggers_timestamps": DefaultDict(lambda: DefaultDict(lambda: {"total": 0})),
             "sum_fail_time": 0,
             "total_times_tests_ran": 0,
             "total_times_tests_ran_passed": 0,
@@ -241,14 +241,14 @@ def compute_kpis(raw_dict):
             #--- pull requets triggers
             if row.get("workflow_event_trigger") == "pull_request":
                 #trends by month
-                grouped_workflows[workflow]["trend_triggers_timestamps"]["by_month"][month_key] +=1
+                grouped_workflows[workflow]["trend_triggers_timestamps"]["by_month"][month_key]["total"] +=1
                 #trends by week
-                grouped_workflows[workflow]["trend_triggers_timestamps"]["by_week"][week_key] +=1
+                grouped_workflows[workflow]["trend_triggers_timestamps"]["by_week"][week_key]["total"]+=1
             else:
                 #trends by month
-                grouped_workflows[workflow]["trend_triggers_timestamps"]["by_month"][month_key] +=0
+                grouped_workflows[workflow]["trend_triggers_timestamps"]["by_month"][month_key]["total"] +=0
                 #trends by week
-                grouped_workflows[workflow]["trend_triggers_timestamps"]["by_week"][week_key] +=0
+                grouped_workflows[workflow]["trend_triggers_timestamps"]["by_week"][week_key]["total"] +=0
             #---
             #-- trends end --
             # test section
@@ -367,7 +367,7 @@ def generate_metrics(grouped_workflows, grouped_issuers, wf_fail_rate,wf_PR_trig
         # by month
         triggers_month_trend = stats["trend_triggers_timestamps"]["by_month"]
         # by week
-        triggers_week_trend = stats["trend_triggers_timestamps"]["by_week"] 
+        triggers_week_trend = stats["trend_triggers_timestamps"]["by_week"]
         # ---pull request triggers end---
         # create line of data for pull request triggers trend
         wf_PR_triggers_trend.append(PullRequestTriggersTrend( workflow_name=wf_name, week_triggers_trend=triggers_week_trend, month_triggers_trend=triggers_month_trend))
@@ -418,10 +418,10 @@ def generate_median_trend(timestamps):
     median_trend = {}
     for time, values in timestamps.items():
         if not values:
-            median_trend[time] = {"median": 0.0, "count": 0}
+            median_trend[time] = {"median": 0.0, "total": 0}
             continue
         median = statistics.median(values)
-        median_trend[time]= {"median": round(median, 2), "count": len(values)}
+        median_trend[time]= {"median": round(median, 2), "total": len(values)}
     return median_trend
 
 
@@ -429,17 +429,20 @@ def generate_median_data_for_tests(timestamps):
     median_trend = {}
     for time, values in timestamps.items():
         if not values:
-            median_trend[time] = {"rate":0.0, "passed_count":0, "total_tests":0}
+            median_trend[time] = {"rate":0.0, "passed_count":0, "total":0}
             continue
         #get all values
+        ## --------
+        ## changed total_passed by total
+        ## --------
         rate = [value.get("rate", 0.0) for value in values]
         passed_count = [value.get("passed_count", 0) for value in values]
-        total_tests = [value.get("total_tests", 0) for value in values]
+        total_tests = [value.get("total", 0) for value in values]
         med_rate = statistics.median(rate) if len(rate) > 1 else 0.0
         med_passed = statistics.median(passed_count) if len(passed_count) > 1 else 0
         med_total = statistics.median(total_tests) if len(total_tests) > 1 else 0
         #write data
-        median_trend[time] = {"rate":med_rate, "passed_count":int(med_passed), "total_tests":int(med_total)}
+        median_trend[time] = {"rate":med_rate, "passed_count":int(med_passed), "total":int(med_total)}
     return median_trend
 
 
@@ -459,12 +462,12 @@ def generate_mad_trend(timestamps):
     mad_trend = {}
     for time, durations in timestamps.items():
         if not durations:
-            mad_trend[time] = {"mad":0.0, "count":0}
+            mad_trend[time] = {"mad":0.0, "total":0}
             continue
         median_duration = statistics.median(durations)
         deviations = [abs(dur - median_duration) for dur in durations]
         mad_duration = statistics.median(deviations)
-        mad_trend[time] = {"mad":round(mad_duration, 2),"count":len(durations)}
+        mad_trend[time] = {"mad":round(mad_duration, 2),"total":len(durations)}
     return mad_trend
 
 
@@ -488,9 +491,9 @@ def process_tests(grouped_workflows, row, workflow,month_key,week_key):
         grouped_workflows[workflow]["tests_ran_count"].append(int(tests_ran))
         # trends
         # by month
-        grouped_workflows[workflow]["trend_tests_data_timestamps"]["by_month"][month_key].append({"rate":pass_rate, "passed_count":passed_count, "total_tests":tests_ran})
+        grouped_workflows[workflow]["trend_tests_data_timestamps"]["by_month"][month_key].append({"rate":pass_rate, "passed_count":passed_count, "total":tests_ran})
         # by week
-        grouped_workflows[workflow]["trend_tests_data_timestamps"]["by_week"][week_key].append({"rate":pass_rate, "passed_count":passed_count, "total_tests":tests_ran})
+        grouped_workflows[workflow]["trend_tests_data_timestamps"]["by_week"][week_key].append({"rate":pass_rate, "passed_count":passed_count, "total":tests_ran})
 
 
 def process_failure(grouped_workflows, duration, workflow,grouped_issuers, issuer_name, time):
@@ -551,7 +554,9 @@ def normalize_timestamps(grouped_workflows):
                 def_val = lambda: [0]
             #set values for test trends
             elif property == "trend_tests_data_timestamps":
-                def_val = lambda: [{"rate": 0.0, "passed_count": 0, "total_tests": 0}]
+                def_val = lambda: [{"rate": 0.0, "passed_count": 0, "total": 0}]
+            elif property == "trend_triggers_timestamps":
+                def_val = lambda: {"total":0}
             else:
                 def_val = lambda: 0
 

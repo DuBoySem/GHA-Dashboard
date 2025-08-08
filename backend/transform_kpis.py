@@ -702,5 +702,8 @@ def test_compute_mad_trend_by_week(raw_dict):
     return workflow_mad_by_week
 #--- test function END ----
 
+def hello():
+    return 5
+
 if __name__ == "__main__":
     print("transform executed from terminal!!!!")

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "webpack",
-    "backend": "cd ../backend && pipenv run uvicorn app:app --reload",
+    "backend": "cd .. && pipenv run uvicorn backend.app:app --reload",
     "start": "npm run build && npm run backend"
   },
   "devDependencies": {

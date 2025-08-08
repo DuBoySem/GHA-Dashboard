@@ -13,8 +13,10 @@ fastapi = "*"
 uvicorn = "*"
 
 [dev-packages]
-pytest = "*"
 pre-commit = "*"
+pytest = "*"
+httpx = "*"
+pytest-asyncio = "*"
 
 [requires]
 python_version = "3.11"

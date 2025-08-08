@@ -8,12 +8,16 @@ import {
     CartesianGrid,
 } from "recharts";
 
-import FailuresTooltip from "../components/tooltips/FailuresTooltip.jsx";
-import { formatNumber } from "../utils/formatNumber";
+import StddevTrendTooltip from "../components/tooltips/StddevTrendTooltip.jsx";
+import { formatNumber } from "../utils/formatNumber.js";
 import { transformTrendData } from "../utils/transformTrendData.js";
 
-const WorkflowFailureLineChart = ({ data, colorMap }) => {
-    const { transformedData, workflowNames } = transformTrendData(data);
+const MedianPassedTestsLineChart = ({ data, colorMap }) => {
+    const { transformedData, workflowNames } = transformTrendData(
+        data,
+        "month_median_trend",
+        "rate"
+    );
 
     if (!transformedData || transformedData.length === 0) {
         return (
@@ -30,6 +34,7 @@ const WorkflowFailureLineChart = ({ data, colorMap }) => {
             <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={transformedData}>
                     <CartesianGrid strokeLinecap="square" />
+
                     <XAxis
                         dataKey="month"
                         angle={-30}
@@ -40,11 +45,11 @@ const WorkflowFailureLineChart = ({ data, colorMap }) => {
                         width={50}
                         axisLine={false}
                         tickFormatter={(value) =>
-                            `${formatNumber(value * 100)}%`
+                            `${formatNumber(value * 100)}`
                         }
                         domain={[0, 1]}
                     />
-                    <Tooltip content={<FailuresTooltip />} />
+                    <Tooltip content={<StddevTrendTooltip unit="" />} />
                     {workflowNames.map((name) => (
                         <Line
                             key={name}
@@ -60,4 +65,4 @@ const WorkflowFailureLineChart = ({ data, colorMap }) => {
     );
 };
 
-export default WorkflowFailureLineChart;
+export default MedianPassedTestsLineChart;

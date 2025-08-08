@@ -9,10 +9,10 @@ import {
     Cell,
 } from "recharts";
 
-import AverageFailedWorkflowExecutionTimeTooltip from '../components/tooltips/AverageFailedWorkflowExecutionTimeTooltip.jsx';
-import { formatNumber } from "../utils/formatNumber";
+import AveragePassedTestsTooltip from "../components/tooltips/AveragePassedTestsTooltip.jsx";
+import { formatNumber } from "../utils/formatNumber.js";
 
-const AverageFailedWorkflowExecutionTimeChart = ({ data, colorMap }) => {
+const MedianPassedTestsChart = ({ data, colorMap }) => {
     if (!data || data.length === 0) {
         return (
             <div className="flex-col flex items-center justify-center p-4">
@@ -30,9 +30,9 @@ const AverageFailedWorkflowExecutionTimeChart = ({ data, colorMap }) => {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
                         type="number"
-                        dataKey="median_duration"
+                        dataKey="median_success_rate"
                         label={{
-                            value: "(seconds)",
+                            value: "(tests)",
                             position: "insideBottomRight",
                         }}
                         height={40}
@@ -44,11 +44,9 @@ const AverageFailedWorkflowExecutionTimeChart = ({ data, colorMap }) => {
                         width={100}
                         hide={true}
                     />
-                    <Tooltip
-                        content={<AverageFailedWorkflowExecutionTimeTooltip />}
-                    />
+                    <Tooltip content={<AveragePassedTestsTooltip />} />
                     <Bar
-                        dataKey="median_duration"
+                        dataKey="median_success_rate"
                         label={({ x, y, width, height, value }) => (
                             <text
                                 x={x + width + 5}
@@ -74,4 +72,4 @@ const AverageFailedWorkflowExecutionTimeChart = ({ data, colorMap }) => {
     );
 };
 
-export default AverageFailedWorkflowExecutionTimeChart;
+export default MedianPassedTestsChart;

@@ -1,6 +1,6 @@
-import { formatNumber } from "../../utils/formatNumber";
+import {formatNumber} from "../../utils/formatNumber";
 
-const StddevTrendTooltip = ({ active, payload, label, unit='' }) => {
+const AverageFailedTrendTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
         const sortedPayload = [...payload].sort((a, b) => b.value - a.value);
 
@@ -18,7 +18,9 @@ const StddevTrendTooltip = ({ active, payload, label, unit='' }) => {
                             className="text-gray-700"
                             style={{ color: entry.stroke }}
                         >
-                            {`${workflowKey}: ${entry.value.toFixed(2)}${unit} (Total Runs: ${total})`}
+                            {`${workflowKey}: ${formatNumber(
+                                entry.value
+                            )}s (Total fails: ${total})`}
                         </p>
                     );
                 })}
@@ -29,4 +31,4 @@ const StddevTrendTooltip = ({ active, payload, label, unit='' }) => {
     return null;
 };
 
-export default StddevTrendTooltip;
+export default AverageFailedTrendTooltip;

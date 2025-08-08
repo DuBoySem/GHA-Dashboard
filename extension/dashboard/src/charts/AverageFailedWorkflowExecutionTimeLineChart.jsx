@@ -8,12 +8,15 @@ import {
     CartesianGrid,
 } from "recharts";
 
-import FailuresTooltip from "../components/tooltips/FailuresTooltip.jsx";
-import { formatNumber } from "../utils/formatNumber";
+import AverageFailedTrendTooltip from "../components/tooltips/AverageFailedTrendTooltip.jsx";
+import { formatNumber } from "../utils/formatNumber.js";
 import { transformTrendData } from "../utils/transformTrendData.js";
 
-const WorkflowFailureLineChart = ({ data, colorMap }) => {
-    const { transformedData, workflowNames } = transformTrendData(data);
+const AverageFailedWorkflowExecutionTimeLineChart = ({ data, colorMap }) => {
+    const { transformedData, workflowNames } = transformTrendData(
+        data,
+        "month_median_trend"
+    );
 
     if (!transformedData || transformedData.length === 0) {
         return (
@@ -39,12 +42,9 @@ const WorkflowFailureLineChart = ({ data, colorMap }) => {
                     <YAxis
                         width={50}
                         axisLine={false}
-                        tickFormatter={(value) =>
-                            `${formatNumber(value * 100)}%`
-                        }
-                        domain={[0, 1]}
+                        tickFormatter={(value) => `${formatNumber(value)} s`}
                     />
-                    <Tooltip content={<FailuresTooltip />} />
+                    <Tooltip content={<AverageFailedTrendTooltip />} />
                     {workflowNames.map((name) => (
                         <Line
                             key={name}
@@ -60,4 +60,4 @@ const WorkflowFailureLineChart = ({ data, colorMap }) => {
     );
 };
 
-export default WorkflowFailureLineChart;
+export default AverageFailedWorkflowExecutionTimeLineChart;

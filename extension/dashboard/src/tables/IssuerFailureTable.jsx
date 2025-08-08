@@ -79,8 +79,11 @@ export const IssuerFailureTable = ({ data }) => {
 
     return (
         <div className="flex-1 overflow-hidden flex flex-col">
-            <div className="flex flex-row items-start justify-between h-20">
-                <h3 className="text-xl font-semibold text-gray-700">
+            <div className="flex justify-between items-center border-l border-r border-t border-gray-300 bg-gray-700 rounded-t-lg p-2">
+                <h3
+                    className="text-white mx-2 font-semibold"
+                    style={{ fontSize: "1.2rem" }}
+                >
                     Failure rate by Contributor
                 </h3>
                 <input
@@ -88,13 +91,13 @@ export const IssuerFailureTable = ({ data }) => {
                     placeholder="Search contributor..."
                     value={search}
                     onChange={handleSearch}
-                    className="border border-gray-300 rounded px-3 py-2 ml-2 w-64 text-gray-500"
+                    className="border border-gray-300 rounded px-3 py-2 ml-2 w-64 text-black bg-white"
                     style={{ minWidth: 0 }}
                 />
             </div>
             <div className="overflow-x-auto rounded-lg border border-gray-200 overflow-y-auto flex-1">
                 <table className="min-w-full table-auto">
-                    <thead className="bg-gray-100 sticky top-0 z-10">
+                    <thead className="bg-gray-200 sticky top-0 z-10">
                         <tr>
                             <th className="px-4 py-2 text-left border-r border-gray-200">
                                 <div className="flex items-center gap-1 text-gray-700">
@@ -177,18 +180,18 @@ export const IssuerFailureTable = ({ data }) => {
                                             : ""
                                     }`}
                                 >
-                                    <td className="px-4 py-2 border-r border-gray-200 text-gray-700">
+                                    <td className="px-4 py-2 border-r border-gray-200 text-white">
                                         {row.issuer_name}
                                     </td>
-                                    <td className="px-4 py-2 border-r border-gray-200 text-gray-700">
+                                    <td className="px-4 py-2 border-r border-gray-200 text-white">
                                         {(row.faillure_rate * 100).toFixed(2)}
                                     </td>
-                                    <td className="px-4 py-2 text-gray-700">
+                                    <td className="px-4 py-2 text-white">
                                         {row.total_runs !== undefined
                                             ? row.total_runs
                                             : row.execution_number}
                                     </td>
-                                    <td className="px-4 py-2 text-gray-700">
+                                    <td className="px-4 py-2 text-white">
                                         {row.failed_runs}
                                     </td>
                                 </tr>

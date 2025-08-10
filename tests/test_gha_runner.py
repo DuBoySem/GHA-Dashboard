@@ -165,9 +165,13 @@ def test_run_gha_async():
         assert mock_token in process_args
         assert str(gha_runner.GHAMETRICS_PATH) in process_args
 
-        # mock_thread.assert_called_once_with(
-        #     target=gha_runner.gha_monitor,
-        #     args=(mock_process,)
-        # )
-        #
-        # mock_thread_instance.start.assert_called_once()
+        mock_thread_func.assert_called_once_with(
+            target=gha_runner.gha_monitor,
+            args=(mock_process,)
+        )
+
+        mock_thread.start.assert_called_once()
+
+
+# def test_patch_gha():
+

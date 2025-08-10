@@ -13,7 +13,7 @@ import { formatNumber } from "../utils/formatNumber";
 import { transformTrendData } from "../utils/transformTrendData.js";
 
 const WorkflowFailureLineChart = ({ data, colorMap }) => {
-    const { transformedData, workflowNames } = transformTrendData(data);
+    const { transformedData, workflowNames } = transformTrendData(data, "month_average_trend", "rate");
 
     if (!transformedData || transformedData.length === 0) {
         return (

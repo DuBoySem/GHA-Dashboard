@@ -16,7 +16,8 @@ import TrendComparison from "../components/TrendComparison.jsx";
 const PullRequestTriggersLineChart = ({ data, colorMap }) => {
     const { transformedData, workflowNames } = transformTrendData(
         data,
-        "month_triggers_trend"
+        "month_triggers_trend",
+        'total'
     );
 
     if (!transformedData || transformedData.length === 0) {

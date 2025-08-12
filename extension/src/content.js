@@ -1,6 +1,6 @@
 //é enforcing utf-8 encoding
 const shadowHost = document.createElement("div");
-shadowHost.id = "gha-dashboard-shadow-host"; // Donnez-lui un ID unique pour cibler si besoin
+shadowHost.id = "gha-dashboard-shadow-host"; 
 document.body.appendChild(shadowHost);
 
 const shadowRoot = shadowHost.attachShadow({ mode: "open" });

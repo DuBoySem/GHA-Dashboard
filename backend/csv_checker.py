@@ -66,4 +66,5 @@ async def check_csv(request: Request):
 
 
 if __name__ == "__main__":
-    print("csv watcher called from terminal")
+    print("csv checker called from terminal")
+    compute(csv_path_read,json_path_write)

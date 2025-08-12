@@ -77,13 +77,13 @@ function HomePage() {
     };
 
     return (
-        <div className={"min-h-screen mx-auto max-w-1/2 bg-white py-20"}>
+        <div className={"min-h-screen mx-auto max-w-1/2 bg-gray-50 py-20"}>
             <div className="flex flex-col mx-auto p-4">
                 <div className={" flex flex-col items-center mb-5 gap-2"}>
                     <h1 className={"text-3xl font-semibold text-black"}>Welcome to GHAminer Dashboard</h1>
                     <p className={"max-w-md text-sm text-center text-black leading-6"}>To get started, enter your GitHub token to generate a dashboard for this GitHub repository.</p>
                 </div>
-                <form onSubmit={handleSubmit} className="w-1/2 mx-auto px-10 py-6 border border-black rounded-2xl">
+                <form onSubmit={handleSubmit} className="w-1/2 mx-auto px-10 py-6 border border-black rounded-2xl bg-white">
 
                     <label className="block mb-2 text-black">
                         GitHub token :
@@ -92,7 +92,7 @@ function HomePage() {
                             placeholder="github_pat_…"
                             value={token}
                             onChange={handleTokenChange}
-                            className="w-full border rounded p-2 mt-1 text-black"
+                            className="w-full border rounded p-2 mt-1 text-black bg-white"
                         />
                         {errors.token && <p className="text-red-500">{errors.token}</p>}
                     </label>
@@ -101,7 +101,7 @@ function HomePage() {
                         type="submit"
                         disabled={isDisabled}
                         className={`px-4 py-2 rounded w-full mt-5 ${
-                            isDisabled ? 'bg-gray-200 cursor-not-allowed text-gray-400' : 'bg-black text-white cursor-pointer hover:bg-gray-800'
+                            isDisabled ? 'bg-gray-200 cursor-not-allowed text-gray-500' : 'bg-gray-800 text-white cursor-pointer hover:bg-gray-700'
                         }`}
                     >
                         Generate dashboard

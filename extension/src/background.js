@@ -103,3 +103,17 @@ chrome.alarms.onAlarm.addListener((alarm) => {
     }
   }
 });
+
+//to prevent timeout stop
+//alarm each 6 seconds
+chrome.alarms.create('keepalive', { periodInMinutes: 0.1 }); 
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'keepalive') {
+    console.log("Keepalive ping");
+    if (runningSSE && !eventSource){
+      startSSE();
+    }
+  }
+});
+
+

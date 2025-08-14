@@ -100,8 +100,7 @@ DHA-Dashboard/
 ├── extensions/dashboard/  # Dashboard's source files
 ├── extensions/dist/       # Dashboard's built and ready to be used as extension
 ├── dashboard/             # Dashboard's source files that can be ran locally on a ReactJS server
-├── docs/                  # Various documentation
-├── output/                # Optional CSV output of extracted metrics
+├── output/                # Optional JSON output of extracted metrics
 ├── backend/               # Python scripts for ingestion and data cleaning
 ```
 

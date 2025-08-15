@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, StreamingResponse
-from gha_runner import run_ghaminer_if_needed
+from .gha_runner import run_ghaminer_if_needed
 import logging
 # from backend.csv_checker import check_csv
-from csv_checker import check_csv
+from .csv_checker import check_csv
 
 router = APIRouter(prefix="/api")
 

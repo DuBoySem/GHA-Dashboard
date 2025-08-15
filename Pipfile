@@ -11,10 +11,8 @@ numpy = "*"
 pandas = "*"
 fastapi = "*"
 uvicorn = "*"
-
-[dev-packages]
 pytest = "*"
+pytest-cov = "*"
 pre-commit = "*"
-
-[requires]
-python_version = "3.11"
+httpx = "*"
+pytest-asyncio = "*"

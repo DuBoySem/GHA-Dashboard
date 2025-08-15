@@ -98,12 +98,12 @@ You have to wait the end of the execution before to go to the next step.
 
 ```text
 DHA-Dashboard/
-├── .github/workflows/     # GitHub Actions scheduler
 ├── extensions/dashboard/  # Dashboard's source files
 ├── extensions/dist/       # Dashboard's built and ready to be used as extension
 ├── dashboard/             # Dashboard's source files that can be ran locally on a ReactJS server
 ├── output/                # Optional JSON output of extracted metrics
 ├── backend/               # Python scripts for ingestion and data cleaning
+├── tests/                 # Backend unit tests
 ```
 
 ## Tracked KPIs

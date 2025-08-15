@@ -84,6 +84,8 @@ npm run build
 ```
 
 The command must be ran from the `./extension` folder.
+As long as the command is still executing, the dashboard is not built yet.
+You have to wait the end of the execution before to go to the next step.
 
 ### 3. Load the extension in Chrome
 

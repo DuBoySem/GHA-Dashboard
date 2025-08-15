@@ -1,4 +1,4 @@
-# GHA Dashboard Pipeline
+# GHA-Dashboard
 
 This project builds an automated dashboard that monitors GitHub Actions workflows for a target repository (e.g., `milvus-io/milvus`). It uses the open-source tool **GHAminer** to extract workflow metrics and visualizes them in a dashboard made in ReactJS injected in the GitHub repository page by a Chrome extension.
 
